@@ -1,4 +1,6 @@
-﻿using PetMarketRfullApi.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PetMarketRfullApi.Data.Contexts;
+using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Services;
 
 namespace PetMarketRfullApi.Sevices
@@ -7,13 +9,19 @@ namespace PetMarketRfullApi.Sevices
     {
         //Контекст БД
 
+        private readonly AppDbContext _appDbContext;
 
-        public Task<Category> GetCategoryByIdAsync(int id)
+        public CategoryService(AppDbContext appDbContext)
         {
-            throw new NotImplementedException();
+            _appDbContext = appDbContext;
         }
 
-        public Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        {
+            return await _appDbContext.Category.ToListAsync();
+        }
+
+        public Task<Category> GetCategoryByIdAsync(int id)
         {
             throw new NotImplementedException();
         }

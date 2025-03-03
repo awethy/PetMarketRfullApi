@@ -9,9 +9,29 @@ namespace PetMarketRfullApi.Data.Contexts
         {
         }
 
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Pet> Pets { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Pet> Pet { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Настройка точности для decimal
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalPrice)
+                .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<Pet>()
+                .Property(o => o.Price)
+                .HasColumnType("decimal(18, 2)");
+
+            // Настройка отношений
+            modelBuilder.Entity<Pet>()
+                .HasOne(p => p.Category)
+                .WithMany()
+                .HasForeignKey(p => p.CategoryId);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
