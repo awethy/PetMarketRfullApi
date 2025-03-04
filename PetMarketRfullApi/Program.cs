@@ -4,8 +4,12 @@ using PetMarketRfullApi.Domain.Services;
 using PetMarketRfullApi.Sevices;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Data.Repositories;
+using AutoMapper;
+using PetMarketRfullApi.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));

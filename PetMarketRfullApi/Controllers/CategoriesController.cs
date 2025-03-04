@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Services;
+using PetMarketRfullApi.Resources;
 
 namespace PetMarketRfullApi.Controllers
 {
@@ -13,10 +15,12 @@ namespace PetMarketRfullApi.Controllers
     {
         //Внедрение зависимости
         private readonly ICategoryServices _categoryService;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryServices categoryService)
+        public CategoriesController(ICategoryServices categoryService, IMapper mapper)
         {
             _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         // GET: api/categories
@@ -24,7 +28,8 @@ namespace PetMarketRfullApi.Controllers
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
             var categories = await  _categoryService.GetAllCategoriesAsync();
-            return Ok(categories);
+            var categoriesResources = _mapper.Map<IEnumerable<CategoryResource>>(categories);
+            return Ok(categoriesResources);
         }
     }
 }
