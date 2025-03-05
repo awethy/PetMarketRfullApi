@@ -25,11 +25,32 @@ namespace PetMarketRfullApi.Controllers
 
         // GET: api/categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<CategoryResource>>> GetCategories()
         {
-            var categories = await  _categoryService.GetAllCategoriesAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
             var categoriesResources = _mapper.Map<IEnumerable<CategoryResource>>(categories);
             return Ok(categoriesResources);
+        }
+
+        //GET: api/categories/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryResource>> GetCategory(int id)
+        {
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            var categoryResource = _mapper.Map<CategoryResource>(category);
+            return Ok(categoryResource);
+        }
+
+        //POST: api/categories/post
+        [HttpPost]
+        public async Task<ActionResult<CategoryResource>> CreateCategory(CreateCategoryResource createCategoryResource)
+        {
+            var categoryResource = await _categoryService.CreateCategoryAsync(createCategoryResource);
+            return CreatedAtAction(nameof(GetCategory), new { id = categoryResource.Id }, categoryResource);
         }
     }
 }

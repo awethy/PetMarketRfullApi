@@ -12,9 +12,11 @@ namespace PetMarketRfullApi.Data.Repositories
         {
         }
 
-        public Task AddCategoryAsync(Category category)
+        public async Task<Category> AddCategoryAsync(Category category)
         {
-            throw new NotImplementedException();
+            _appDbContext.Category.Add(category);
+            await _appDbContext.SaveChangesAsync();
+            return category;
         }
 
         public Task DeleteCategoryAsync(int id)
@@ -27,9 +29,14 @@ namespace PetMarketRfullApi.Data.Repositories
             return await _appDbContext.Category.ToListAsync();
         }
 
-        public Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _appDbContext.Category.FindAsync(id);
+        }
+
+        public async Task<Category> GetByNameAsync(string name)
+        {
+            return await _appDbContext.Category.FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public Task UpdateCategoryAsync(Category category)

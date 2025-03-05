@@ -2,10 +2,10 @@
 
 namespace PetMarketRfullApi.Resources
 {
-    public class CategoryResource
+    public class CreateCategoryResource
     {
-        public int Id { get; set; }
         [Required]
+        [MaxLength(30)]
         public string Name { get; set; }
         public string Description { get; set; }
     }

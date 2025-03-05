@@ -11,12 +11,13 @@ namespace PetMarketRfullApi.Domain.Repositories
         Task<Category> GetCategoryByIdAsync(int id);
 
         // Добавить новую категорию
-        Task AddCategoryAsync(Category category);
+        Task<Category> AddCategoryAsync(Category category);
 
         // Обновить существующую категорию
         Task UpdateCategoryAsync(Category category);
 
         // Удалить категорию по идентификатору
         Task DeleteCategoryAsync(int id);
+        Task<Category> GetByNameAsync(string name);
     }
 }
