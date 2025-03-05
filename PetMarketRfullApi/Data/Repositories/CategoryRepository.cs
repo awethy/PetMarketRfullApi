@@ -19,9 +19,14 @@ namespace PetMarketRfullApi.Data.Repositories
             return category;
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
+            var category = await _appDbContext.Category.FindAsync(id);
+            if (category != null)
+            {
+                _appDbContext.Category.Remove(category);
+                await _appDbContext.SaveChangesAsync();
+            } 
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()

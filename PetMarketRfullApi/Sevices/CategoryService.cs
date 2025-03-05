@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
@@ -37,7 +39,7 @@ namespace PetMarketRfullApi.Sevices
         }
 
         public async Task<CategoryResource> CreateCategoryAsync(CreateCategoryResource createCategoryResource)
-        {
+        {             
             var existingCategory = await _repository.GetByNameAsync(createCategoryResource.Name);
             if (existingCategory != null)
             {
@@ -50,14 +52,23 @@ namespace PetMarketRfullApi.Sevices
             return _mapper.Map<CategoryResource>(createdCategory);
         }
 
-        public Task<Category> UpdateCategoryAsync(int id, Category category)
+        public Task<CategoryResource> UpdateCategoryAsync(int id, Category category)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Category> DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
+            var existingCategory = await _repository.GetCategoryByIdAsync(id);
+            if (existingCategory == null)
+            {
+                throw new InvalidOperationException("Not found category");
+            }
+            //if (existingCategory.Pets.Any())
+            //{
+            //    throw new InvalidOperationException("Cannot delete category with associated pets.");
+            //}
+            await _repository.DeleteCategoryAsync(id);
         }
     }
 }

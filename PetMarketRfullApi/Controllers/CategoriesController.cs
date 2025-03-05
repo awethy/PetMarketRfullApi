@@ -49,8 +49,28 @@ namespace PetMarketRfullApi.Controllers
         [HttpPost]
         public async Task<ActionResult<CategoryResource>> CreateCategory(CreateCategoryResource createCategoryResource)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var categoryResource = await _categoryService.CreateCategoryAsync(createCategoryResource);
             return CreatedAtAction(nameof(GetCategory), new { id = categoryResource.Id }, categoryResource);
+        }
+
+        //DELETE: api/categories/{id}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<CategoryResource>> DeleteCategory(int id)
+        {
+            try
+            {
+                await _categoryService.DeleteCategoryAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex) 
+            {
+                return NotFound(ex.Message); // 404 not found
+            }
         }
     }
 }
