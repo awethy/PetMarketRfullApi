@@ -1,24 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
+using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
 
 namespace PetMarketRfullApi.Sevices
 {
     public class CategoryService : ICategoryServices
     {
-        //Контекст БД
+        //Контекст Репозитория
 
-        private readonly AppDbContext _appDbContext;
+        private readonly ICategoryRepository _repository;
 
-        public CategoryService(AppDbContext appDbContext)
+        public CategoryService(ICategoryRepository repository)
         {
-            _appDbContext = appDbContext;
+            _repository = repository;
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await _appDbContext.Category.ToListAsync();
+            return await _repository.GetAllCategoriesAsync();
         }
 
         public Task<Category> GetCategoryByIdAsync(int id)
