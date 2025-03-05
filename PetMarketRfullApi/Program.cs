@@ -18,6 +18,7 @@ builder.Services.AddScoped<ICategoryServices, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 // Add services to the container.
+//test
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
