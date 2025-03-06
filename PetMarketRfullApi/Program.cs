@@ -14,6 +14,7 @@ builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryServices, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 

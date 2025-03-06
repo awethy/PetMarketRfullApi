@@ -14,23 +14,23 @@ namespace PetMarketRfullApi.Sevices
     {
         //Контекст Репозитория
 
-        private readonly ICategoryRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository repository, IMapper mapper)
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _repository = repository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await _repository.GetAllCategoriesAsync();
+            return await _unitOfWork.Categories.GetAllCategoriesAsync();
         }
 
         public async Task<CategoryResource> GetCategoryByIdAsync(int id)
         {
-            var category = await _repository.GetCategoryByIdAsync(id);
+            var category = await _unitOfWork.Categories.GetCategoryByIdAsync(id);
             if (category == null)
             {   
                 return null;
@@ -40,7 +40,7 @@ namespace PetMarketRfullApi.Sevices
 
         public async Task<CategoryResource> CreateCategoryAsync(CreateCategoryResource createCategoryResource)
         {             
-            var existingCategory = await _repository.GetByNameAsync(createCategoryResource.Name);
+            var existingCategory = await _unitOfWork.Categories.GetByNameAsync(createCategoryResource.Name);
             if (existingCategory != null)
             {
                 throw new InvalidOperationException("Category with the same name already exists.");
@@ -48,7 +48,7 @@ namespace PetMarketRfullApi.Sevices
 
 
             var category = _mapper.Map<Category>(createCategoryResource);
-            var createdCategory = await _repository.AddCategoryAsync(category);
+            var createdCategory = await _unitOfWork.Categories.AddCategoryAsync(category);
             return _mapper.Map<CategoryResource>(createdCategory);
         }
 
@@ -59,7 +59,7 @@ namespace PetMarketRfullApi.Sevices
 
         public async Task DeleteCategoryAsync(int id)
         {
-            var existingCategory = await _repository.GetCategoryByIdAsync(id);
+            var existingCategory = await _unitOfWork.Categories.GetCategoryByIdAsync(id);
             if (existingCategory == null)
             {
                 throw new InvalidOperationException("Not found category");
@@ -68,7 +68,7 @@ namespace PetMarketRfullApi.Sevices
             //{
             //    throw new InvalidOperationException("Cannot delete category with associated pets.");
             //}
-            await _repository.DeleteCategoryAsync(id);
+            await _unitOfWork.Categories.DeleteCategoryAsync(id);
         }
     }
 }
