@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Domain.Models
+namespace PetMarketRfullApi.Resources
 {
-    public class Category
+    public class UpdateCategoryResource
     {
-        public int Id { get; set; }
         [Required(ErrorMessage = "Name is required")]
+        [MaxLength(30)]
         public string Name { get; set; }
         public string Description { get; set; }
     }

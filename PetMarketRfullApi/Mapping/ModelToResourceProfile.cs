@@ -12,6 +12,7 @@ namespace PetMarketRfullApi.Mapping
             CreateMap<Category, CategoryResource>();
             CreateMap<CategoryResource, Category>();
             CreateMap<CreateCategoryResource, Category>();
+            CreateMap<UpdateCategoryResource, Category>();
         }
     }
 }

@@ -72,5 +72,25 @@ namespace PetMarketRfullApi.Controllers
                 return NotFound(ex.Message); // 404 not found
             }
         }
+
+        //PUT: api/categories/{id}
+        [HttpPut("id")]
+        public async Task<ActionResult<CategoryResource>> UpdateCategory(int id, /*[FromBody]*/ UpdateCategoryResource updateCategoryResource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _categoryService.UpdateCategoryAsync(id, updateCategoryResource);
+                return Ok(updateCategoryResource);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

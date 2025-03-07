@@ -46,15 +46,33 @@ namespace PetMarketRfullApi.Sevices
                 throw new InvalidOperationException("Category with the same name already exists.");
             }
 
-
             var category = _mapper.Map<Category>(createCategoryResource);
             var createdCategory = await _unitOfWork.Categories.AddCategoryAsync(category);
             return _mapper.Map<CategoryResource>(createdCategory);
         }
 
-        public Task<CategoryResource> UpdateCategoryAsync(int id, Category category)
+        public async Task UpdateCategoryAsync(int id, UpdateCategoryResource updateCategoryResource)
         {
-            throw new NotImplementedException();
+            var existingCategory = await _unitOfWork.Categories.GetCategoryByIdAsync(id);
+            if (existingCategory == null)
+            {
+                throw new KeyNotFoundException("Category not found.");
+            }
+
+            //проверяем, существует ли категория с таким же именем (кроме текущей)
+            var categoryWithSameName = await _unitOfWork.Categories.GetByNameAsync(updateCategoryResource.Name);
+            if (categoryWithSameName != null && categoryWithSameName.Id != id)
+            {
+                throw new InvalidOperationException("Category with the same name already exists.");
+            }
+
+            existingCategory.Name = updateCategoryResource.Name;
+            existingCategory.Description = updateCategoryResource.Description;
+
+            var category = _mapper.Map<Category>(existingCategory);
+
+            await _unitOfWork.Categories.UpdateCategoryAsync(category);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteCategoryAsync(int id)

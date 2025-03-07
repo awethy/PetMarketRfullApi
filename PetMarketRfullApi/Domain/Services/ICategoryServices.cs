@@ -8,7 +8,7 @@ namespace PetMarketRfullApi.Domain.Services
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
         Task<CategoryResource> GetCategoryByIdAsync(int id);
         Task<CategoryResource> CreateCategoryAsync(CreateCategoryResource createCategoryResource);
-        Task<CategoryResource> UpdateCategoryAsync(int id, Category category);
+        Task UpdateCategoryAsync(int id, UpdateCategoryResource updateCategoryResource);
         Task DeleteCategoryAsync(int id);
     }
 }
