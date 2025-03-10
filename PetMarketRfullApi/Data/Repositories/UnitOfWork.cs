@@ -10,9 +10,11 @@ namespace PetMarketRfullApi.Data.Repositories
         public UnitOfWork(AppDbContext appDbContext) : base(appDbContext) 
         {
             Categories = new CategoryRepository(_appDbContext);
+            Pets = new PetRepository(_appDbContext);
         }
 
         public ICategoryRepository Categories { get; }
+        public IPetRepository Pets { get; }
 
         public async Task<int> SaveChangesAsync()
         {

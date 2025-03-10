@@ -32,8 +32,8 @@ namespace PetMarketRfullApi.Sevices
         {
             var category = await _unitOfWork.Categories.GetCategoryByIdAsync(id);
             if (category == null)
-            {   
-                return null;
+            {
+                throw new InvalidOperationException("Not found category");
             }
             return _mapper.Map<CategoryResource>(category);
         }
@@ -82,10 +82,6 @@ namespace PetMarketRfullApi.Sevices
             {
                 throw new InvalidOperationException("Not found category");
             }
-            //if (existingCategory.Pets.Any())
-            //{
-            //    throw new InvalidOperationException("Cannot delete category with associated pets.");
-            //}
             await _unitOfWork.Categories.DeleteCategoryAsync(id);
         }
     }
