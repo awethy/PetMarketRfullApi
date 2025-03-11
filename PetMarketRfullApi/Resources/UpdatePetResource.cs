@@ -1,11 +1,9 @@
-﻿using PetMarketRfullApi.Domain.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetMarketRfullApi.Resources
 {
-    public class PetResource
+    public class UpdatePetResource
     {
-        public int Id { get; set; }
         [Required(ErrorMessage = "Name is required")]
         [MaxLength(30)]
         public string Name { get; set; }

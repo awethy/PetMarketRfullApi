@@ -18,6 +18,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryServices, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+builder.Services.AddScoped<IPetService, PetService>();
+builder.Services.AddScoped<IPetRepository, PetRepository>();
+
 // Add services to the container.
 //test2
 
