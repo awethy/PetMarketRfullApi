@@ -9,7 +9,8 @@ namespace PetMarketRfullApi.Mapping
         public ModelToResourceProfile()
         {
 
-            CreateMap<Category, CategoryResource>();
+            CreateMap<Category, CategoryResource>()
+                .ForMember(dest => dest.PetNames, opt => opt.MapFrom(src => src.Pets.Select(p => p.Name).ToList()));
             CreateMap<CategoryResource, Category>();
             CreateMap<CreateCategoryResource, Category>();
             CreateMap<UpdateCategoryResource, Category>();

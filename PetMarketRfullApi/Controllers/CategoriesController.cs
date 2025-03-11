@@ -6,6 +6,7 @@ using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Services;
 using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Sevices;
 
 namespace PetMarketRfullApi.Controllers
 {
@@ -28,8 +29,7 @@ namespace PetMarketRfullApi.Controllers
         public async Task<ActionResult<IEnumerable<CategoryResource>>> GetCategories()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
-            var categoriesResources = _mapper.Map<IEnumerable<CategoryResource>>(categories);
-            return Ok(categoriesResources);
+            return Ok(categories);
         }
 
         //GET: api/categories/{id}

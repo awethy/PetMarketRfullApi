@@ -6,6 +6,9 @@ using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Data.Repositories;
 using AutoMapper;
 using PetMarketRfullApi.Mapping;
+using PetMarketRfullApi.Infrastructure.Converters;
+using System.Security.Cryptography.Xml;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +27,12 @@ builder.Services.AddScoped<IPetRepository, PetRepository>();
 // Add services to the container.
 //test2
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>  
+    {
+        options.JsonSerializerOptions.Converters.Add(new CustomDateConverter("dd/MM/yyyy"));
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -9,5 +9,6 @@ namespace PetMarketRfullApi.Resources
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
         public string Description { get; set; }
+        public List<string> PetNames { get; set; }
     }
 }

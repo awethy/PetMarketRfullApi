@@ -23,9 +23,10 @@ namespace PetMarketRfullApi.Sevices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        public async Task<IEnumerable<CategoryResource>> GetAllCategoriesAsync()
         {
-            return await _unitOfWork.Categories.GetAllCategoriesAsync();
+            var categories = await _unitOfWork.Categories.GetAllCategoriesAsync();
+            return _mapper.Map<IEnumerable<CategoryResource>>(categories);
         }
 
         public async Task<CategoryResource> GetCategoryByIdAsync(int id)
@@ -81,6 +82,11 @@ namespace PetMarketRfullApi.Sevices
             if (existingCategory == null)
             {
                 throw new InvalidOperationException("Not found category");
+            }
+            else if (existingCategory.Pets.Any())
+            {
+                // Если есть связанные продукты, выбрасываем исключение или возвращаем ошибку
+                throw new InvalidOperationException("Категория не может быть удалена, так как у нее есть связанные pets.");
             }
             await _unitOfWork.Categories.DeleteCategoryAsync(id);
         }

@@ -31,7 +31,9 @@ namespace PetMarketRfullApi.Data.Repositories
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await _appDbContext.Category.ToListAsync();
+            return await _appDbContext.Category
+                .Include(c => c.Pets)
+                .ToListAsync();
         }
 
         public async Task<Category> GetCategoryByIdAsync(int id)
@@ -41,7 +43,9 @@ namespace PetMarketRfullApi.Data.Repositories
 
         public async Task<Category> GetByNameAsync(string name)
         {
-            return await _appDbContext.Category.FirstOrDefaultAsync(c => c.Name == name);
+            return await _appDbContext.Category
+                .Include(c => c.Pets)
+                .FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public async Task UpdateCategoryAsync(Category category)

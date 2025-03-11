@@ -31,12 +31,16 @@ namespace PetMarketRfullApi.Data.Repositories
 
         public async Task<IEnumerable<Pet>> GetAllPetsAsync()
         {
-            return await _appDbContext.Pet.ToListAsync();
+            return await _appDbContext.Pet
+                .Include(p => p.Category)
+                .ToListAsync();
         }
 
         public async Task<Pet> GetByNameAsync(string name)
         {
-            return await _appDbContext.Pet.FirstOrDefaultAsync(c => c.Name == name);
+            return await _appDbContext.Pet
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public async Task<Pet> GetPetByIdAsync(int id)

@@ -17,23 +17,10 @@ namespace PetMarketRfullApi.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Настройка точности для decimal
-            modelBuilder.Entity<Order>()
-                .Property(o => o.TotalPrice)
-                .HasColumnType("decimal(18, 2)");
-
-            modelBuilder.Entity<Product>()
-                .Property(o => o.Price)
-                .HasColumnType("decimal(18, 2)");
-
-            modelBuilder.Entity<Pet>()
-                .Property(o => o.Price)
-                .HasColumnType("decimal(18, 2)");
-
             // Настройка отношений
             modelBuilder.Entity<Pet>()
                 .HasOne(p => p.Category)
-                .WithMany()
+                .WithMany(c => c.Pets)
                 .HasForeignKey(p => p.CategoryId);
 
             base.OnModelCreating(modelBuilder);

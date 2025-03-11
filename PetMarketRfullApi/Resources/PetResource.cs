@@ -14,6 +14,6 @@ namespace PetMarketRfullApi.Resources
         [Required(ErrorMessage = "Date of birth is required")]
         public DateTime DateOfBirth { get; set; }
         public bool IsAvailable { get; set; }
-        public int CategoryId { get; set; }
+        public CategoryResource Category { get; set; }
     }
 }

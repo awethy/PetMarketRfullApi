@@ -5,7 +5,7 @@ namespace PetMarketRfullApi.Domain.Services
 {
     public interface ICategoryServices
     {
-        Task<IEnumerable<Category>> GetAllCategoriesAsync();
+        Task<IEnumerable<CategoryResource>> GetAllCategoriesAsync();
         Task<CategoryResource> GetCategoryByIdAsync(int id);
         Task<CategoryResource> CreateCategoryAsync(CreateCategoryResource createCategoryResource);
         Task UpdateCategoryAsync(int id, UpdateCategoryResource updateCategoryResource);
