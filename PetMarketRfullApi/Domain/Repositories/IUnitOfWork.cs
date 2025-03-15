@@ -4,6 +4,7 @@
     {
         ICategoryRepository Categories { get; }
         IPetRepository Pets { get; }
+        IUserRepository Users { get; }
 
         Task<int> SaveChangesAsync();
     }

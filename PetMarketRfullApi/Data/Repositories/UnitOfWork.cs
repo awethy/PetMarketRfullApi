@@ -11,10 +11,12 @@ namespace PetMarketRfullApi.Data.Repositories
         {
             Categories = new CategoryRepository(_appDbContext);
             Pets = new PetRepository(_appDbContext);
+            Users = new UserRepository(_appDbContext);
         }
 
         public ICategoryRepository Categories { get; }
         public IPetRepository Pets { get; }
+        public IUserRepository Users { get; }
 
         public async Task<int> SaveChangesAsync()
         {

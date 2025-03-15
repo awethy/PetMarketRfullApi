@@ -19,6 +19,11 @@ namespace PetMarketRfullApi.Mapping
             CreateMap<PetResource, Pet>();
             CreateMap<CreatePetResource, Pet>();
             CreateMap<UpdatePetResource, Pet>();
+
+            CreateMap<User, UserResource>();
+            CreateMap<UserResource, User>();
+            CreateMap<CreateUserResource, User>();
+            CreateMap<UpdateUserResource, User>();
         }
     }
 }

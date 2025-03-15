@@ -66,7 +66,7 @@ namespace PetMarketRfullApi.Controllers
         }
 
         //PUT: api/pets/{id}
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<PetResource>> UpdatePet(int id, /*[FromBody]*/ UpdatePetResource updatePetResource)
         {
             if (!ModelState.IsValid)
