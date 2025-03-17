@@ -9,6 +9,9 @@ using PetMarketRfullApi.Mapping;
 using PetMarketRfullApi.Infrastructure.Converters;
 using System.Security.Cryptography.Xml;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using PetMarketRfullApi.Domain.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,11 @@ builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));
+
+builder.Services.AddIdentity<User, UserRole>()
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
+
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryServices, CategoryService>();

@@ -74,7 +74,7 @@ namespace PetMarketRfullApi.Sevices
             existingUser.Name = updateUserResource.Name;
             existingUser.Email = updateUserResource.Email;
             existingUser.Password = updateUserResource.Password;
-            existingUser.Role = updateUserResource.Role;
+            //existingUser.Role = updateUserResource.Role;
 
             var user = _mapper.Map<User>(existingUser);
 
