@@ -19,7 +19,7 @@ namespace PetMarketRfullApi.Data.Repositories
             return user;
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(string id)
         {
             var user = await _appDbContext.Users.FindAsync(id);
             if (user != null)
@@ -31,21 +31,19 @@ namespace PetMarketRfullApi.Data.Repositories
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _appDbContext.Users
-                .ToListAsync();
+            return await _appDbContext.Users.ToListAsync();
         }
 
         public async Task<User> GetByNameAsync(string name)
         {
             return await _appDbContext.Users
-                .FirstOrDefaultAsync(c => c.Name == name);
+                .FirstOrDefaultAsync(c => c.UserName == name);
         }
 
-        public async Task<User> GetUserByIdAsync(int id)
+        public async Task<User> GetUserByIdAsync(string id)
         {
             return await _appDbContext.Users
                 .FindAsync(id);
-                //.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task UpdateUserAsync(User user)

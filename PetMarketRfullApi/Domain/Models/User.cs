@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetMarketRfullApi.Domain.Models
 {
     public class User : IdentityUser
     {
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string id { get; set; }
 
         public ICollection<Order> Orders { get; set; }
     }

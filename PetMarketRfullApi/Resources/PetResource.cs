@@ -12,7 +12,7 @@ namespace PetMarketRfullApi.Resources
         public decimal Price { get; set; }
         public string Description { get; set; }
         [Required(ErrorMessage = "Date of birth is required")]
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
         public bool IsAvailable { get; set; }
         public CategoryResource Category { get; set; }
     }
