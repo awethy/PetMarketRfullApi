@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PetMarketRfullApi.Domain.Models;
+using PetMarketRfullApi.Resources.СategoriesResource;
+using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Resources
+namespace PetMarketRfullApi.Resources.PetsResources
 {
-    public class UpdatePetResource
+    public class PetResource
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "Name is required")]
         [MaxLength(30)]
         public string Name { get; set; }
@@ -12,6 +15,6 @@ namespace PetMarketRfullApi.Resources
         [Required(ErrorMessage = "Date of birth is required")]
         public DateOnly DateOfBirth { get; set; }
         public bool IsAvailable { get; set; }
-        public int CategoryId { get; set; }
+        public CategoryResource Category { get; set; }
     }
 }

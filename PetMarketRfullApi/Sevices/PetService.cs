@@ -2,7 +2,7 @@
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.PetsResources;
 
 namespace PetMarketRfullApi.Sevices
 {

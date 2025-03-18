@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using PetMarketRfullApi.Domain.Models;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.PetsResources;
+using PetMarketRfullApi.Resources.UsersResources;
+using PetMarketRfullApi.Resources.СategoriesResource;
 
 namespace PetMarketRfullApi.Mapping
 {
@@ -29,7 +31,8 @@ namespace PetMarketRfullApi.Mapping
             CreateMap<CreateUserResource, User>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
-            CreateMap<UpdateUserResource, User>();
+            CreateMap<UpdateUserResource, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); 
         }
     }
 }

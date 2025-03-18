@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.СategoriesResource;
 using PetMarketRfullApi.Sevices;
 
 namespace PetMarketRfullApi.Controllers

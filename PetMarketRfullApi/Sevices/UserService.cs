@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.AccountResources;
+using PetMarketRfullApi.Resources.UsersResources;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace PetMarketRfullApi.Sevices
 {
@@ -23,51 +26,19 @@ namespace PetMarketRfullApi.Sevices
             _userManager = userManager;
         }
 
-        //public async Task<UserResource> CreateUserAsync(CreateUserResource createUserResource)
-        //{
-        //    var existingUser = await _unitOfWork.Users.GetByNameAsync(createUserResource.Name);
-        //    if (existingUser != null)
-        //    {
-        //        throw new InvalidOperationException("User with the same name|email already exists.");
-        //    }
-
-        //    var user = _mapper.Map<User>(createUserResource);
-        //    var createdUser = await _unitOfWork.Users.AddUserAsync(user);
-        //    return _mapper.Map<UserResource>(createdUser);
-        //}
-
-        public async Task<IdentityResult> RegisterUserAsync(CreateUserResource createUserResource)
+        public async Task<UserResource> CreateUserAsync(CreateUserResource createUserResource)
         {
-            try
+            var existingUser = await _unitOfWork.Users.GetByNameAsync(createUserResource.Name);
+            if (existingUser != null)
             {
-                var user = _mapper.Map<User>(createUserResource) /*new User { UserName = createUserResource.Name, Email = createUserResource.Email }*/;
-                return await _userManager.CreateAsync(user, createUserResource.Password);
-            }
-            catch (Exception ex) { Console.WriteLine(ex); throw; }
-        }
-
-        public async Task<SignInResult> LoginAsync(LoginUserResource userResource)
-        {
-            var user = await _userManager.FindByEmailAsync(userResource.Email);
-            if (user == null)
-            {
-                return SignInResult.Failed;
-            }
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                return SignInResult.NotAllowed;
-            }
-            if (await _userManager.IsLockedOutAsync(user))
-            {
-                return SignInResult.LockedOut;
+                throw new InvalidOperationException("User with the same name|email already exists.");
             }
 
-            return await _signInManager.PasswordSignInAsync(user, userResource.Password, userResource.RememberMe, lockoutOnFailure: false);
-        }
 
-        public async Task LogoutAsync()
-        {
-            await _signInManager.SignOutAsync();
+
+            var user = _mapper.Map<User>(createUserResource);
+            var createdUser = await _unitOfWork.Users.AddUserAsync(user);
+            return _mapper.Map<UserResource>(createdUser);
         }
 
         public async Task DeleteUserAsync(string id)
@@ -96,30 +67,28 @@ namespace PetMarketRfullApi.Sevices
             return _mapper.Map<UserResource>(user);
         }
 
-        public async Task UpdateUserAsync(string id, UpdateUserResource updateUserResource)
+        public async Task<IdentityResult> UpdateUserAsync(string id, UpdateUserResource updateUserResource)
         {
-            var existingUser = await _unitOfWork.Users.GetUserByIdAsync(id);
-            if (existingUser == null)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
 
             //проверяем, существует ли User с таким же именем (кроме текущей)
-            var userWithSameName = await _unitOfWork.Users.GetByNameAsync(updateUserResource.Name);
-            if (userWithSameName != null && userWithSameName.id != id)
-            {
-                throw new InvalidOperationException("User with the same name already exists.");
-            }
+            //var userWithSameName = await _unitOfWork.Users.GetByNameAsync(updateUserResource.Name);
+            //if (userWithSameName != null && userWithSameName.id != id)
+            //{
+            //    throw new InvalidOperationException("User with the same name already exists.");
+            //}
 
-            existingUser.UserName = updateUserResource.Name;
-            existingUser.Email = updateUserResource.Email;
-            existingUser.PasswordHash = updateUserResource.Password;
-            //existingUser.Role = updateUserResource.Role;
+            user.UserName = updateUserResource.Name;
+            user.Email = updateUserResource.Email;
+            user.PhoneNumber = updateUserResource.PhoneNumber;
 
-            var user = _mapper.Map<User>(existingUser);
+            var mUser = _mapper.Map<User>(user);
 
-            await _unitOfWork.Users.UpdateUserAsync(user);
-            await _unitOfWork.SaveChangesAsync();
+            return await _userManager.UpdateAsync(mUser);
         }
     }
 }

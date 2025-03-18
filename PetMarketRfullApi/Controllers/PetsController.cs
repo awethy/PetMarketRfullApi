@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.PetsResources;
 using PetMarketRfullApi.Sevices;
 
 namespace PetMarketRfullApi.Controllers

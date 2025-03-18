@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using PetMarketRfullApi.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,26 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UpdateUserPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireAssertion(context =>
+        {
+            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var routeData = context.Resource as RouteData;
+            var requestedUserId = routeData?.Values["id"]?.ToString();
+
+            return userId == requestedUserId || context.User.IsInRole("admin");
+        });
+    });
+    options.AddPolicy("AdminOnly", policy => {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("admin");
+    });
+});
 
 
 var app = builder.Build();

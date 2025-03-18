@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.AccountResources;
+using PetMarketRfullApi.Resources.UsersResources;
 
 namespace PetMarketRfullApi.Domain.Services
 {
@@ -14,14 +15,8 @@ namespace PetMarketRfullApi.Domain.Services
         // Добавить новую user
         //Task<UserResource> CreateUserAsync(CreateUserResource createUserResource);
 
-        Task<SignInResult> LoginAsync(LoginUserResource userResource);
-
-        Task LogoutAsync();
-
-        Task<IdentityResult> RegisterUserAsync(CreateUserResource createUserResource);
-
         // Обновить существующую user
-        Task UpdateUserAsync(string id, UpdateUserResource updateUserResource);
+        Task<IdentityResult> UpdateUserAsync(string id, UpdateUserResource updateUserResource);
 
         // Удалить user по id
         Task DeleteUserAsync(string id);

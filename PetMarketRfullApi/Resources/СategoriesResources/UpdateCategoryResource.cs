@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Resources
+namespace PetMarketRfullApi.Resources.СategoriesResource
 {
     public class UpdateCategoryResource
     {

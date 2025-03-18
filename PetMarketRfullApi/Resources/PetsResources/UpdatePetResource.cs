@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Resources
+namespace PetMarketRfullApi.Resources.PetsResources
 {
-    public class CreatePetResource
+    public class UpdatePetResource
     {
         [Required(ErrorMessage = "Name is required")]
         [MaxLength(30)]

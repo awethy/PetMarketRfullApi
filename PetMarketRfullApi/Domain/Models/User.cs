@@ -7,7 +7,7 @@ namespace PetMarketRfullApi.Domain.Models
     public class User : IdentityUser
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string id { get; set; }
+        public string Id { get; set; }
 
         public ICollection<Order> Orders { get; set; }
     }

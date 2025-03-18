@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.AccountResources;
+using PetMarketRfullApi.Resources.UsersResources;
 using System.Collections.Specialized;
 
 namespace PetMarketRfullApi.Controllers
@@ -23,7 +25,7 @@ namespace PetMarketRfullApi.Controllers
             return Ok(users);
         }
 
-        [HttpGet("string")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserResource>> GetUser(string id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -32,70 +34,22 @@ namespace PetMarketRfullApi.Controllers
                 return NotFound();
             }
             return Ok(user);
-        }
+        } 
 
-        [HttpPost("register")]
-        public async Task<IActionResult/*ActionResult<UserResource>*/> Register(CreateUserResource createUserResource)
+        [HttpPut("{id}")]
+        [Authorize(Policy = "UpdateUserPolicy")]
+        public async Task<IActionResult> UpdateUser(string id, UpdateUserResource updateUser)
         {
-            var result = await _userService.RegisterUserAsync(createUserResource);
+            var result = await _userService.UpdateUserAsync(id, updateUser);
             if (result.Succeeded)
             {
-                return Ok(result);
+                return Ok(new {message = "User updated successfully"});
             }
             return BadRequest(result.Errors);
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-
-            //var user = await _userService.RegisterUserAsync(createUserResource);
-            //return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginUserResource userResource)
-        {
-            var result = await _userService.LoginAsync(userResource);
-
-            if (result.Succeeded)
-            {
-                return Ok(result);
-            }
-
-            if (result.IsLockedOut)
-            {
-                return Unauthorized(new { Message = "Your account is locked. Please try again later." });
-            }
-
-            if (result.IsNotAllowed)
-            {
-                return Unauthorized(new { Message = "Please confirm your email." });
-            }
-
-            return Unauthorized(new { Message = "Invalid email or password." });
-        }
-
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            await _userService.LogoutAsync();
-            return Ok();
-        }
-
-        [HttpPut("string")]
-        public async Task<ActionResult<UserResource>> UpdateUser(string id, UpdateUserResource updateUser)
-        {
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
-
-            try
-            {
-                await _userService.UpdateUserAsync(id, updateUser);
-                return Ok(updateUser);
-            }
-            catch (Exception ex) { return NotFound(ex.Message); }
-        }
-
-        [HttpDelete("string")]
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<UserResource>> DeleteUser(string id)
         {
             try

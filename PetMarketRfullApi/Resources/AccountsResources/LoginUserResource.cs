@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Resources
+namespace PetMarketRfullApi.Resources.AccountResources
 {
     public class LoginUserResource
     {
