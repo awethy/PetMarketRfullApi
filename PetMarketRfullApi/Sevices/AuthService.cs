@@ -56,20 +56,30 @@ namespace PetMarketRfullApi.Sevices
             var result = await _signInManager.PasswordSignInAsync(user, userResource.Password, userResource.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                var claims = new List<Claim>
+                try
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id)
-                };
+                    var claims = new List<Claim>
+                        {
+                             new Claim(ClaimTypes.NameIdentifier, user.Id)
+                        };
 
-                var roles = await _userManager.GetRolesAsync(user);
-                foreach (var role in roles)
+                    var roles = await _userManager.GetRolesAsync(user);
+                    foreach (var role in roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                    }
+
+                    await _userManager.AddClaimsAsync(user, claims);
+
+                    await _signInManager.SignInAsync(user, userResource.RememberMe);
+                }
+                catch (Exception ex)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                    // Логирование ошибки
+                    Console.WriteLine($"Ошибка при добавлении claims: {ex.Message}");
+                    return SignInResult.Failed;
                 }
 
-                await _userManager.AddClaimsAsync(user, claims);
-
-                await _signInManager.SignInAsync(user, userResource.RememberMe);
             }
             return result;
         }

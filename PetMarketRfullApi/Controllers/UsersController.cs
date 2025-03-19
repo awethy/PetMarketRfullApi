@@ -49,7 +49,7 @@ namespace PetMarketRfullApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        //[Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<UserResource>> DeleteUser(string id)
         {
             try
