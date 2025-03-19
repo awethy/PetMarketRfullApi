@@ -42,10 +42,10 @@ namespace PetMarketRfullApi.Controllers
                 return Unauthorized(new { Message = "Your account is locked. Please try again later." });
             }
 
-            if (result.IsNotAllowed)
-            {
-                return Unauthorized(new { Message = "Please confirm your email." });
-            }
+            //if (result.IsNotAllowed)
+            //{
+            //    return Unauthorized(new { Message = "Please confirm your email." });
+            //}
 
             return Unauthorized(new { Message = "Invalid email or password." });
         }

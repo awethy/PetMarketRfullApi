@@ -44,10 +44,10 @@ namespace PetMarketRfullApi.Sevices
             {
                 return SignInResult.Failed;
             }
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                return SignInResult.NotAllowed;
-            }
+            //if (!await _userManager.IsEmailConfirmedAsync(user))
+            //{
+            //    return SignInResult.NotAllowed;
+            //}
             if (await _userManager.IsLockedOutAsync(user))
             {
                 return SignInResult.LockedOut;

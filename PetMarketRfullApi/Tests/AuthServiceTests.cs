@@ -16,10 +16,10 @@ namespace PetMarketRfullApi.Tests
         public async Task LoginAsync_ReturnSuccess()
         {
             //arrange
-            var user = new User { Id = "657bf307-50a0-4742-9dd5-118b8f9cafcb" };
+            var user = new User { Email = "UTest@examle.com"/*Id = "657bf307-50a0-4742-9dd5-118b8f9cafcb"*/ };
             var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManagerMock.Setup(x => x.FindByEmailAsync("Test1!@example.com")).ReturnsAsync(user);
-            userManagerMock.Setup(x => x.IsEmailConfirmedAsync(user)).ReturnsAsync(true);
+            userManagerMock.Setup(x => x.FindByEmailAsync("UTest@examle.com")).ReturnsAsync(user);
+            userManagerMock.Setup(x => x.IsEmailConfirmedAsync(user)).ReturnsAsync(false);
             userManagerMock.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
             userManagerMock.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "user" });
             userManagerMock.Setup(x => x.AddClaimsAsync(user, It.IsAny<IEnumerable<Claim>>())).ReturnsAsync(IdentityResult.Success);
@@ -40,16 +40,41 @@ namespace PetMarketRfullApi.Tests
                 userClaimsPrincipalFactoryMock.Object, // Используем mock для UserClaimsPrincipalFactory
                 null, null, null, null);
 
-            signInManagerMock.Setup(x => x.PasswordSignInAsync(user, "Test1!", false, false)).ReturnsAsync(SignInResult.Success);
+            signInManagerMock.Setup(x => x.PasswordSignInAsync(user, "Test123!", false, false)).ReturnsAsync(SignInResult.Success);
 
             var mapper = new Mock<IMapper>();
 
             var authService = new AuthService(mapper.Object, userManagerMock.Object, signInManagerMock.Object);
 
             //act
-            var result = await authService.LoginAsync(new LoginUserResource { Email = "Test1!@example.com", Password = "Test1!" });
+            var result = await authService.LoginAsync(new LoginUserResource { Email = "UTest@examle.com", Password = "Test123!" });
 
             //assert
+            Assert.True(result.Succeeded);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ReturnSuccess()
+        {
+            //arrange
+            var user = new User { Email = "UTest@examle.com" };
+            var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+            userManagerMock.Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success);
+            userManagerMock.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var mapper = new Mock<IMapper>();
+
+            var authService = new AuthService(mapper.Object, userManagerMock.Object, null);
+
+            //act
+            var result = await authService
+                .RegisterUserAsync(new Resources.UsersResources.CreateUserResource 
+                    { Name = "UTest", Email = "UTest@examle.com", Password = "Test123!", ConfirmPassword = "Test123!" });
+
+
+            //asssert
             Assert.True(result.Succeeded);
         }
     }

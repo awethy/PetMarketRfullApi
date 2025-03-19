@@ -22,7 +22,10 @@ builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));
 
-builder.Services.AddIdentity<User, UserRole>()
+builder.Services.AddIdentity<User, UserRole>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = false;
+})
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
