@@ -1,5 +1,5 @@
 ﻿using PetMarketRfullApi.Domain.Models;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.PetsResources;
 
 namespace PetMarketRfullApi.Domain.Services
 {

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.AccountResources;
+using PetMarketRfullApi.Resources.UsersResources;
 using System.Collections.Specialized;
 
 namespace PetMarketRfullApi.Controllers
@@ -24,7 +26,7 @@ namespace PetMarketRfullApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserResource>> GetUser(int id)
+        public async Task<ActionResult<UserResource>> GetUser(string id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
@@ -32,35 +34,23 @@ namespace PetMarketRfullApi.Controllers
                 return NotFound();
             }
             return Ok(user);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<UserResource>> CreateUser(CreateUserResource createUserResource)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = await _userService.CreateUserAsync(createUserResource);
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
+        } 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserResource>> UpdateUser(int id, UpdateUserResource updateUser)
+        [Authorize(Policy = "UpdateUserPolicy")]
+        public async Task<IActionResult> UpdateUser(string id, UpdateUserResource updateUser)
         {
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
-
-            try
+            var result = await _userService.UpdateUserAsync(id, updateUser);
+            if (result.Succeeded)
             {
-                await _userService.UpdateUserAsync(id, updateUser);
-                return Ok(updateUser);
+                return Ok(new {message = "User updated successfully"});
             }
-            catch (Exception ex) { return NotFound(ex.Message); }
+            return BadRequest(result.Errors);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<UserResource>> DeleteUser(int id)
+        //[Authorize(Policy = "AdminOnly")]
+        public async Task<ActionResult<UserResource>> DeleteUser(string id)
         {
             try
             {

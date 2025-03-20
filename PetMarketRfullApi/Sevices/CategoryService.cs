@@ -6,7 +6,7 @@ using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.СategoriesResource;
 
 namespace PetMarketRfullApi.Sevices
 {

@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
-using PetMarketRfullApi.Resources;
+using PetMarketRfullApi.Resources.AccountResources;
+using PetMarketRfullApi.Resources.UsersResources;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace PetMarketRfullApi.Sevices
 {
@@ -11,10 +15,15 @@ namespace PetMarketRfullApi.Sevices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         public async Task<UserResource> CreateUserAsync(CreateUserResource createUserResource)
@@ -25,12 +34,14 @@ namespace PetMarketRfullApi.Sevices
                 throw new InvalidOperationException("User with the same name|email already exists.");
             }
 
+
+
             var user = _mapper.Map<User>(createUserResource);
             var createdUser = await _unitOfWork.Users.AddUserAsync(user);
             return _mapper.Map<UserResource>(createdUser);
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(string id)
         {
             var existingUser = await _unitOfWork.Users.GetUserByIdAsync(id);
             if (existingUser == null)
@@ -42,11 +53,11 @@ namespace PetMarketRfullApi.Sevices
 
         public async Task<IEnumerable<UserResource>> GetAllUsersAsync()
         {
-            var users = await _unitOfWork.Users.GetAllUsersAsync();
-            return _mapper.Map<IEnumerable<UserResource>>(users);
+                var users = await _unitOfWork.Users.GetAllUsersAsync();
+                return _mapper.Map<IEnumerable<UserResource>>(users);
         }
 
-        public async Task<UserResource> GetUserByIdAsync(int id)
+        public async Task<UserResource> GetUserByIdAsync(string id)
         {
             var user = await _unitOfWork.Users.GetUserByIdAsync(id);
             if (user == null)
@@ -56,30 +67,28 @@ namespace PetMarketRfullApi.Sevices
             return _mapper.Map<UserResource>(user);
         }
 
-        public async Task UpdateUserAsync(int id, UpdateUserResource updateUserResource)
+        public async Task<IdentityResult> UpdateUserAsync(string id, UpdateUserResource updateUserResource)
         {
-            var existingUser = await _unitOfWork.Users.GetUserByIdAsync(id);
-            if (existingUser == null)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
 
             //проверяем, существует ли User с таким же именем (кроме текущей)
-            var userWithSameName = await _unitOfWork.Users.GetByNameAsync(updateUserResource.Name);
-            if (userWithSameName != null && userWithSameName.Id != id)
-            {
-                throw new InvalidOperationException("User with the same name already exists.");
-            }
+            //var userWithSameName = await _unitOfWork.Users.GetByNameAsync(updateUserResource.Name);
+            //if (userWithSameName != null && userWithSameName.id != id)
+            //{
+            //    throw new InvalidOperationException("User with the same name already exists.");
+            //}
 
-            existingUser.Name = updateUserResource.Name;
-            existingUser.Email = updateUserResource.Email;
-            existingUser.Password = updateUserResource.Password;
-            existingUser.Role = updateUserResource.Role;
+            user.UserName = updateUserResource.Name;
+            user.Email = updateUserResource.Email;
+            user.PhoneNumber = updateUserResource.PhoneNumber;
 
-            var user = _mapper.Map<User>(existingUser);
+            var mUser = _mapper.Map<User>(user);
 
-            await _unitOfWork.Users.UpdateUserAsync(user);
-            await _unitOfWork.SaveChangesAsync();
+            return await _userManager.UpdateAsync(mUser);
         }
     }
 }

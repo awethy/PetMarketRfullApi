@@ -8,7 +8,7 @@ namespace PetMarketRfullApi.Domain.Repositories
         Task<IEnumerable<User>> GetAllUsersAsync();
 
         // Получить user по id
-        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByIdAsync(string id);
 
         // Добавить новую user
         Task<User> AddUserAsync(User user);
@@ -17,7 +17,7 @@ namespace PetMarketRfullApi.Domain.Repositories
         Task UpdateUserAsync(User user);
 
         // Удалить user по id
-        Task DeleteUserAsync(int id);
+        Task DeleteUserAsync(string id);
         Task<User> GetByNameAsync(string name);
     }
 }

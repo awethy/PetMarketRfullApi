@@ -9,9 +9,11 @@ namespace PetMarketRfullApi.Domain.Models
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
         public bool IsAvailable { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
     }
 }
