@@ -54,6 +54,45 @@ namespace PetMarketRfullApi.Tests
         }
 
         [Fact]
+        public async Task LoginAsync_ReturnFailed_InvalidPass()
+        {
+            //arrange
+            var user = new User { Email = "UTest@examle.com" };
+            var userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+            userManagerMock.Setup(x => x.FindByEmailAsync("UTest@examle.com")).ReturnsAsync(user);
+            userManagerMock.Setup(x => x.IsEmailConfirmedAsync(user)).ReturnsAsync(true);
+            userManagerMock.Setup(x => x.IsLockedOutAsync(user)).ReturnsAsync(false);
+            userManagerMock.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "user" });
+            userManagerMock.Setup(x => x.AddClaimsAsync(user, It.IsAny<IEnumerable<Claim>>())).ReturnsAsync(IdentityResult.Success);
+
+            //Mock для IOptions<IdentityOptions>
+            var optionsMock = new Mock<IOptions< IdentityOptions >> ();
+            optionsMock.Setup(x => x.Value).Returns(new IdentityOptions());
+
+            //mock для UserClaimsPrincipalFactory<User>
+            var userClaimsPrincipalFactoryMock = new Mock<UserClaimsPrincipalFactory<User>>(
+                userManagerMock.Object, optionsMock.Object);  
+
+            var signInManagerMock = new Mock<SignInManager<User>>(
+            userManagerMock.Object,
+            Mock.Of<IHttpContextAccessor>(),
+            userClaimsPrincipalFactoryMock.Object,
+            null, null, null, null);
+
+            signInManagerMock.Setup(x => x.PasswordSignInAsync(user, "wrongpassword", false, false)).ReturnsAsync(SignInResult.Failed);
+
+            var mapper = new Mock<IMapper>();
+
+            var authService = new AuthService(mapper.Object, userManagerMock.Object, signInManagerMock.Object);
+
+            //act
+            var result = await authService.LoginAsync(new LoginUserResource { Email = "UTest@examle.com", Password = "wrongpassword" });
+
+            //assert
+            Assert.False(result.Succeeded);
+        }
+
+        [Fact]
         public async Task RegisterAsync_ReturnSuccess()
         {
             //arrange
