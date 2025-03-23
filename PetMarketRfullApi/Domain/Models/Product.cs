@@ -1,4 +1,6 @@
-﻿namespace PetMarketRfullApi.Domain.Models
+﻿using PetMarketRfullApi.Domain.Models.OrderModels;
+
+namespace PetMarketRfullApi.Domain.Models
 {
     public class Product
     {
@@ -9,7 +11,5 @@
         public bool IsAvailable { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
-
-        public ICollection<Order> Orders { get; set; }
     }
 }

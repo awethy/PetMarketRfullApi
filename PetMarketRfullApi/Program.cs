@@ -14,20 +14,18 @@ using PetMarketRfullApi.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using PetMarketRfullApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));
-
 builder.Services.AddIdentity<User, UserRole>(options =>
 {
     options.SignIn.RequireConfirmedEmail = false;
 })
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -42,18 +40,20 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 // Add services to the container.
 //test2
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>  
     {
-        options.JsonSerializerOptions.Converters.Add(new CustomDateConverter("dd/MM/yyyy"));
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -62,26 +62,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("UpdateUserPolicy", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireAssertion(context =>
-        {
-            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var routeData = context.Resource as RouteData;
-            var requestedUserId = routeData?.Values["id"]?.ToString();
-
-            return userId == requestedUserId || context.User.IsInRole("admin");
-        });
-    });
-    options.AddPolicy("AdminOnly", policy => {
-        policy.RequireAuthenticatedUser();
-        policy.RequireRole("admin");
-    });
-});
-
+builder
+    .AddSwagger()
+    .AppData()
+    .AddAuthorization();
 
 var app = builder.Build();
 

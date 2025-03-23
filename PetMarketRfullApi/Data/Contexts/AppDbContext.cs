@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Domain.Models;
+using PetMarketRfullApi.Domain.Models.OrderModels;
 
 namespace PetMarketRfullApi.Data.Contexts
 {
@@ -13,7 +14,9 @@ namespace PetMarketRfullApi.Data.Contexts
         public DbSet<Category> Category { get; set; }
         public DbSet<Pet> Pet { get; set; }
         public DbSet<Order> Orders { get; set; }
-        //public DbSet<User> Users { get; set; }  
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,26 +33,23 @@ namespace PetMarketRfullApi.Data.Contexts
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId);
 
+            // cart & cartitem
+            modelBuilder.Entity<Cart>()
+                .HasMany(c => c.Items)
+                .WithOne(ci => ci.Cart)
+                .HasForeignKey(ci => ci.CartId);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Cart)
+                .WithOne(c => c.Order)
+                .HasForeignKey<Order>(o => o.CartId);
+
             // Настройка связи между Order и User
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
-                .OnDelete(DeleteBehavior.Restrict); ;
-
-            // Настройка связи между Order и Product
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Product)
-                .WithMany(p => p.Orders)
-                .HasForeignKey(o => o.ProductId)
-                .OnDelete(DeleteBehavior.Restrict); ;
-
-            // Настройка связи между Order и Pet
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Pet)
-                .WithMany(p => p.Orders)
-                .HasForeignKey(o => o.PetId)
-                .OnDelete(DeleteBehavior.Restrict); ;
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

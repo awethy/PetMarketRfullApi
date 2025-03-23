@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using PetMarketRfullApi.Domain.Models.OrderModels;
 
 namespace PetMarketRfullApi.Domain.Models
 {
@@ -13,7 +14,5 @@ namespace PetMarketRfullApi.Domain.Models
         public bool IsAvailable { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
-
-        public ICollection<Order> Orders { get; set; }
     }
 }

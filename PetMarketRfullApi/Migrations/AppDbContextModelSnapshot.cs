@@ -149,25 +149,54 @@ namespace PetMarketRfullApi.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Order", b =>
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.Cart", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.CartItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.HasKey("Id");
+
+                    b.HasIndex("CartId");
+
+                    b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quanity")
-                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -182,9 +211,8 @@ namespace PetMarketRfullApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PetId");
-
-                    b.HasIndex("ProductId");
+                    b.HasIndex("CartId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -401,18 +429,23 @@ namespace PetMarketRfullApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Order", b =>
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.CartItem", b =>
                 {
-                    b.HasOne("PetMarketRfullApi.Domain.Models.Pet", "Pet")
-                        .WithMany("Orders")
-                        .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("PetMarketRfullApi.Domain.Models.OrderModels.Cart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PetMarketRfullApi.Domain.Models.Product", "Product")
-                        .WithMany("Orders")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.Navigation("Cart");
+                });
+
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.Order", b =>
+                {
+                    b.HasOne("PetMarketRfullApi.Domain.Models.OrderModels.Cart", "Cart")
+                        .WithOne("Order")
+                        .HasForeignKey("PetMarketRfullApi.Domain.Models.OrderModels.Order", "CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PetMarketRfullApi.Domain.Models.User", "User")
@@ -421,9 +454,7 @@ namespace PetMarketRfullApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Pet");
-
-                    b.Navigation("Product");
+                    b.Navigation("Cart");
 
                     b.Navigation("User");
                 });
@@ -457,14 +488,12 @@ namespace PetMarketRfullApi.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Pet", b =>
+            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.OrderModels.Cart", b =>
                 {
-                    b.Navigation("Orders");
-                });
+                    b.Navigation("Items");
 
-            modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Product", b =>
-                {
-                    b.Navigation("Orders");
+                    b.Navigation("Order")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PetMarketRfullApi.Domain.Models.User", b =>
