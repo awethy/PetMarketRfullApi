@@ -2,6 +2,9 @@
 using Moq;
 using PetMarketRfullApi.Domain.Models.OrderModels;
 using PetMarketRfullApi.Domain.Repositories;
+using PetMarketRfullApi.Domain.Services;
+using PetMarketRfullApi.Mapping;
+using PetMarketRfullApi.Resources.CartsResources;
 using PetMarketRfullApi.Resources.OrdersResources;
 using PetMarketRfullApi.Sevices;
 using System.Runtime.CompilerServices;
@@ -16,37 +19,68 @@ namespace PetMarketRfullApi.Tests
         {
             //arrange
             var mockUnitOfWork = new Mock<IUnitOfWork>();
-            var mockMapper = new Mock<IMapper>();
+            var mockMapper = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<ModelToResourceProfile>();
+            }).CreateMapper();
+            var mockICartService = new Mock<ICartService>();
 
-            var createOrderResource = new CreateOrderResource();
+            // Генерируем тестовые ID
+            var cartId = Guid.NewGuid();
             var orderId = Guid.NewGuid();
-            var order = new Order { Id = orderId};
 
-            var createdOrder = new Order { Id = orderId };
+            // Создаем тестовые данные с явно указанными ID
+            var cartItems = new List<CartItemResource>
+            { new CartItemResource { PetId = 1} };
+            var cartResource = new CartResource { Id = cartId, Items = cartItems };
+
+            var createOrderResource = new CreateOrderResource
+            {
+                Cart = cartResource
+            };
+            var order = new Order { Id = orderId};
+            var createdOrder = new Order { Id = orderId, CartId = cartId };
             var orderResource = new OrderResource { Id = orderId };
 
-            //map CreateOrderResource в Order
-            mockMapper.Setup(m => m.Map<Order>(It.IsAny<CreateOrderResource>())).Returns(order);
 
-            mockUnitOfWork.Setup(u => u.Orders.AddOrderAsync(It.IsAny<Order>())).ReturnsAsync(createdOrder);
+            //map CreateOrderResource в Order
+            //mockMapper.Setup(m => m.Map<Order>(
+            //    It.IsAny<CreateOrderResource>(),
+            //    It.IsAny<Action<IMappingOperationOptions>>()))
+            //    .Callback<CreateOrderResource, Action<IMappingOperationOptions>>((src, opts) =>
+            //    {
+                    
+            //    });
+
+
+            mockICartService.Setup(c => c.CreateCartAsync(It.IsAny<CartResource>()))
+                .ReturnsAsync(cartResource);
+
+            //mockUnitOfWork.Setup(u => u.Orders.AddOrderAsync(It.IsAny<Order>())).ReturnsAsync(createdOrder);
+            mockUnitOfWork.Setup(u => u.Orders.AddOrderAsync(It.Is<Order>(order => order.CartId == cartId)))
+                .ReturnsAsync(createdOrder)
+                .Verifiable();
 
             //map Order в OrderResource
-            mockMapper.Setup(m => m.Map<OrderResource>(It.IsAny<Order>())).Returns(orderResource);
+            //mockMapper.Setup(m => m.Map<OrderResource>(It.IsAny<Order>()))
+            //    .Returns(orderResource);
 
-            var orderService = new OrderService(mockMapper.Object, mockUnitOfWork.Object);
+            var orderService = new OrderService(mockMapper, mockUnitOfWork.Object, mockICartService.Object);
 
             //act
+            Console.WriteLine($"CartResource is null: {createOrderResource.Cart == null}");
+            Console.WriteLine($"CartService is null: {mockICartService.Object == null}");
             var result = await orderService.Create(createOrderResource);
 
             //assert
             Assert.NotNull(result);
             Assert.IsType<OrderResource>(result);
-
             Assert.Equal(orderId, result.Id);
 
-            mockMapper.Verify(m => m.Map<Order>(It.IsAny<CreateOrderResource>()), Times.Once());
-            mockMapper.Verify(m => m.Map<OrderResource>(It.IsAny<Order>()), Times.Once());
+            //mockMapper.Verify(m => m.Map<Order>(It.IsAny<CreateOrderResource>()), Times.Once());
+            //mockMapper.Verify(m => m.Map<OrderResource>(It.IsAny<Order>()), Times.Once());
             mockUnitOfWork.Verify(u => u.Orders.AddOrderAsync(It.IsAny<Order>()), Times.Once());
+            mockICartService.Verify(c => c.CreateCartAsync(It.IsAny<CartResource>()), Times.Once());
         }
 
     }

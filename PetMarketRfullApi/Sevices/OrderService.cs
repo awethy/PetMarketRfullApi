@@ -12,16 +12,29 @@ namespace PetMarketRfullApi.Sevices
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public OrderService(IMapper mapper, IUnitOfWork unitOfWork)
+        private readonly ICartService _cartService;
+
+        public OrderService(IMapper mapper, IUnitOfWork unitOfWork, ICartService cartService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _cartService = cartService;
         }
 
         public async Task<OrderResource> Create(CreateOrderResource createOrder)
         {
-            var order = _mapper.Map<Order>(createOrder);
+            var cart = await _cartService.CreateCartAsync(createOrder.Cart);
+            if (cart.Id == Guid.Empty)
+                throw new InvalidOperationException("Cart ID cannot be empty");
+
+            var order = _mapper.Map<Order>(createOrder, opts =>
+            {
+                opts.Items["CartId"] = cart.Id;
+            });
+            order.CartId = cart.Id;
+
             var createdOrder = await _unitOfWork.Orders.AddOrderAsync(order);
+
             return _mapper.Map<OrderResource>(createdOrder);
         }
 

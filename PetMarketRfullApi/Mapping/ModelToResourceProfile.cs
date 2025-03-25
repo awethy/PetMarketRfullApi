@@ -40,14 +40,12 @@ namespace PetMarketRfullApi.Mapping
             CreateMap<OrderResource, Order>();
             CreateMap<Order, OrderResource>();
             CreateMap<CreateOrderResource, Order>()
-                .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.OrderDate))
-                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(dest => dest.Cart, opt => opt.MapFrom(src => src.Cart));
+                .ForMember(dest => dest.CartId, opt => opt.MapFrom((src, dest, _, context) => context.Items["CartId"]));
             CreateMap<Order, CreateOrderResource>();
 
             CreateMap<CartResource, Cart>();
             CreateMap<Cart, CartResource>();
+
             CreateMap<CartItemResource, CartItem>()
                 .ForMember(dest => dest.CartId, opt => opt.MapFrom((src, dest, _, context) => context.Items["CartId"]));
         }

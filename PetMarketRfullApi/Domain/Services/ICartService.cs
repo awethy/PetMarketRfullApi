@@ -4,6 +4,6 @@ namespace PetMarketRfullApi.Domain.Services
 {
     public interface ICartService
     {
-        Task<CartResource> CreateCart(CartResource cart);
+        Task<CartResource> CreateCartAsync(CartResource cart);
     }
 }

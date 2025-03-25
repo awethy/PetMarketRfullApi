@@ -17,7 +17,7 @@ namespace PetMarketRfullApi.Sevices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<CartResource> CreateCart(CartResource cartResource)
+        public async Task<CartResource> CreateCartAsync(CartResource cartResource)
         {
             var cart = _mapper.Map<Cart>(cartResource);
             // Создание корзины и сохранение в базу данных

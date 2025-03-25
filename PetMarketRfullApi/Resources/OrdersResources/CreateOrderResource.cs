@@ -9,6 +9,7 @@ namespace PetMarketRfullApi.Resources.OrdersResources
         public decimal TotalPrice { get; set; }
         public string Status { get; set; }
         public string UserId { get; set; }
+
         public CartResource Cart { get; set; } = null!; 
     }
 }
