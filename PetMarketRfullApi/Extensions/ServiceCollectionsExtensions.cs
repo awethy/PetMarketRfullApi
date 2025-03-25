@@ -2,6 +2,10 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using PetMarketRfullApi.Data.Contexts;
+using PetMarketRfullApi.Data.Repositories;
+using PetMarketRfullApi.Domain.Repositories;
+using PetMarketRfullApi.Domain.Services;
+using PetMarketRfullApi.Sevices;
 using System.Security.Claims;
 
 namespace PetMarketRfullApi.Extensions
@@ -78,6 +82,28 @@ namespace PetMarketRfullApi.Extensions
                     policy.RequireRole("admin");
                 });
             });
+            return builder;
+        }
+
+        public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ICategoryServices, CategoryService>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            builder.Services.AddScoped<IPetService, PetService>();
+            builder.Services.AddScoped<IPetRepository, PetRepository>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+            builder.Services.AddScoped<ICartService, CartService>(); 
+
             return builder;
         }
     }
