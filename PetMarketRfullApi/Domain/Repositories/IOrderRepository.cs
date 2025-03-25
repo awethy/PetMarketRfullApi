@@ -7,8 +7,8 @@ namespace PetMarketRfullApi.Domain.Repositories
     {
         Task<Order> AddOrderAsync(Order order);
         Task<Order> GetById(Guid orderId);
-        Task<List<Order>> GetByUser(string userId);
-        Task<List<Order>> GetAll();
+        Task<List<Order>> GetByUserAsync(string userId);
+        Task<List<Order>> GetAllAsync();
         Task Reject(Guid orderId);
     }
 }

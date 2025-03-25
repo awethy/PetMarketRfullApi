@@ -48,9 +48,10 @@ namespace PetMarketRfullApi.Data.Repositories
                 .FirstOrDefaultAsync(c => c.Name == name);
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public Task UpdateCategoryAsync(Category category)
         {
             _appDbContext.Category.Update(category);
-        }   
+            return Task.CompletedTask;
+        }
     }
 }

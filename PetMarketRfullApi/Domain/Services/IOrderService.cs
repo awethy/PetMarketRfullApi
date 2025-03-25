@@ -7,7 +7,7 @@ namespace PetMarketRfullApi.Domain.Services
         Task<OrderResource> Create(CreateOrderResource createOrder);
         Task<OrderResource> GetByIdAsync(Guid orderId);
         Task<List<OrderResource>> GetByUser(string userId);
-        Task<List<OrderResource>> GetAll();
+        Task<List<OrderResource>> GetAllAsync();
         Task Reject(Guid orderId);
     }
 }

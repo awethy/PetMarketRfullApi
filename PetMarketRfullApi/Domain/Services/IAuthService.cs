@@ -10,6 +10,6 @@ namespace PetMarketRfullApi.Domain.Services
 
         Task LogoutAsync();
 
-        Task<IdentityResult> RegisterUserAsync(CreateUserResource createUserResource);
+        Task<UserResource> RegisterUserAsync(CreateUserResource createUserResource);
     }
 }

@@ -38,9 +38,11 @@ namespace PetMarketRfullApi.Sevices
             return _mapper.Map<OrderResource>(createdOrder);
         }
 
-        public Task<List<OrderResource>> GetAll()
+        public async Task<List<OrderResource>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var orders = await _unitOfWork.Orders.GetAllAsync();
+
+            return _mapper.Map<List<OrderResource>>(orders);
         }
 
         public async Task<OrderResource> GetByIdAsync(Guid orderId)
@@ -53,9 +55,11 @@ namespace PetMarketRfullApi.Sevices
             return _mapper.Map<OrderResource>(order);
         }
 
-        public Task<List<OrderResource>> GetByUser(string userId)
+        public async Task<List<OrderResource>> GetByUser(string userId)
         {
-            throw new NotImplementedException();
+            var orders = await _unitOfWork.Orders.GetByUserAsync(userId);
+
+            return _mapper.Map<List<OrderResource>>(orders);
         }
 
         public Task Reject(Guid orderId)

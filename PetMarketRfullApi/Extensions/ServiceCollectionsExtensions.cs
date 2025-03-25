@@ -1,12 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PetMarketRfullApi.Data.Contexts;
 using PetMarketRfullApi.Data.Repositories;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
+using PetMarketRfullApi.Options;
 using PetMarketRfullApi.Sevices;
 using System.Security.Claims;
+using System.Text;
 
 namespace PetMarketRfullApi.Extensions
 {
@@ -103,6 +107,43 @@ namespace PetMarketRfullApi.Extensions
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             builder.Services.AddScoped<ICartService, CartService>(); 
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder AddBearerAuthentication(this WebApplicationBuilder builder)
+        {
+            builder.Services
+                .AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                            builder.Configuration["Authentication:TokenPrivateKey"]!)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("admin", policy => policy.RequireRole("admin"));
+                options.AddPolicy("user", policy => policy.RequireRole("user"));
+            });
+            builder.Services.AddTransient<IAuthService, AuthService>();
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
+        {
+            builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Authentication"));
 
             return builder;
         }

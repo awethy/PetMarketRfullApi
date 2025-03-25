@@ -20,11 +20,8 @@ namespace PetMarketRfullApi.Controllers
         public async Task<IActionResult> Register(CreateUserResource createUserResource)
         {
             var result = await _authService.RegisterUserAsync(createUserResource);
-            if (result.Succeeded)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result.Errors);
+
+            return Ok(result);
         }
 
         [HttpPost("login")]

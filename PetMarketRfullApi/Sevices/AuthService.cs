@@ -1,10 +1,17 @@
 ﻿using AutoMapper;
+using Azure;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Services;
+using PetMarketRfullApi.Options;
 using PetMarketRfullApi.Resources.AccountResources;
 using PetMarketRfullApi.Resources.UsersResources;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace PetMarketRfullApi.Sevices
 {
@@ -15,39 +22,61 @@ namespace PetMarketRfullApi.Sevices
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AuthService(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly AuthOptions _authOptions;
+
+        public AuthService(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IOptions<AuthOptions> authOptions)
         {
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
+            _authOptions = authOptions.Value;
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(CreateUserResource createUserResource)
+        public async Task<UserResource> RegisterUserAsync(CreateUserResource createUserResource)
         {
-            try
+            if (await _userManager.FindByEmailAsync(createUserResource.Email) != null)
             {
-                var user = _mapper.Map<User>(createUserResource);
-                var result = await _userManager.CreateAsync(user, createUserResource.Password);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "user");
-                }
-                return result;
+                throw new Exception($"Email {createUserResource.Email} already exists");
             }
-            catch (Exception ex) { Console.WriteLine(ex); throw; }
+
+                var userEn = _mapper.Map<User>(createUserResource);
+
+                var createdUser = await _userManager.CreateAsync(userEn, createUserResource.Password);
+                if (createdUser.Succeeded)
+                {
+                    var user = await _userManager.FindByEmailAsync(createUserResource.Email);
+                    if (user == null) 
+                    {
+                        throw new Exception($"User with email {createUserResource.Email} not registered"); 
+                    }
+
+                    var result = await _userManager.AddToRoleAsync(userEn, "user");
+                    if (result.Succeeded)
+                    {
+                        var userRoles = await _userManager.GetRolesAsync(user);
+                        var response = new UserResource
+                        {
+                            id = user.Id,
+                            Email = user.Email,
+                            Roles = userRoles.ToArray(),
+                            Name = user.UserName,
+                        };
+                        return GenerateToken(response);
+                    }
+                    throw new Exception($"Errors: {string.Join(";", result.Errors
+                        .Select(x => $"{x.Code} {x.Description}"))}");
+                }
+            throw new Exception();
         }
 
-        public async Task<SignInResult> LoginAsync(LoginUserResource userResource)
+    public async Task<SignInResult> LoginAsync(LoginUserResource userResource)
         {
             var user = await _userManager.FindByEmailAsync(userResource.Email);
             if (user == null)
             {
                 return SignInResult.Failed;
             }
-            //if (!await _userManager.IsEmailConfirmedAsync(user))
-            //{
-            //    return SignInResult.NotAllowed;
-            //}
+                
             if (await _userManager.IsLockedOutAsync(user))
             {
                 return SignInResult.LockedOut;
@@ -56,30 +85,15 @@ namespace PetMarketRfullApi.Sevices
             var result = await _signInManager.PasswordSignInAsync(user, userResource.Password, userResource.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                try
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var response = new UserResource
                 {
-                    var claims = new List<Claim>
-                        {
-                             new Claim(ClaimTypes.NameIdentifier, user.Id)
-                        };
-
-                    var roles = await _userManager.GetRolesAsync(user);
-                    foreach (var role in roles)
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-                    }
-
-                    await _userManager.AddClaimsAsync(user, claims);
-
-                    await _signInManager.SignInAsync(user, userResource.RememberMe);
-                }
-                catch (Exception ex)
-                {
-                    // Логирование ошибки
-                    Console.WriteLine($"Ошибка при добавлении claims: {ex.Message}");
-                    return SignInResult.Failed;
-                }
-
+                    id = user.Id,
+                    Email = user.Email,
+                    Roles = userRoles.ToArray(),
+                    Name = user.UserName
+                };
+                GenerateToken(response);
             }
             return result;
         }
@@ -89,17 +103,49 @@ namespace PetMarketRfullApi.Sevices
             await _signInManager.SignOutAsync();
         }
 
-        //public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordResource forgotPassword)
-        //{
-        //    var user = await _userManager.FindByEmailAsync(forgotPassword.Email);
-        //    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-        //    {
-        //        return 
-        //    }
+        public UserResource GenerateToken(UserResource userRegModel)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_authOptions.TokenPrivateKey);
+            var credentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature);
 
-        //    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        //    var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContent.Request.Scheme);
-        //    EmailService email = EmailService();
-        //}
+            var claims = new Dictionary<string, Object>
+            {
+                {ClaimTypes.Name, userRegModel.Name!},
+                {ClaimTypes.NameIdentifier, userRegModel.id!},
+                {JwtRegisteredClaimNames.Aud, "test"},
+                {JwtRegisteredClaimNames.Iss, "test" }
+            };
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = GenerateClaims(userRegModel),
+                Expires = DateTime.UtcNow.AddMinutes(_authOptions.ExpireIntervalMinutes),
+                SigningCredentials = credentials,
+                Claims = claims,
+                Audience = "test",
+                Issuer = "test"
+            };
+
+            var token = handler.CreateToken(tokenDescriptor);
+            userRegModel.Token = handler.WriteToken(token);
+
+            return userRegModel;
+        }
+
+        private static ClaimsIdentity GenerateClaims(UserResource userRegModel)
+        {
+            var claims = new ClaimsIdentity();
+            claims.AddClaim(new Claim(ClaimTypes.Name, userRegModel.Email!));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userRegModel.id!));
+            claims.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, "test"));
+            claims.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, "test"));
+
+            foreach (var role in userRegModel.Roles!)
+                claims.AddClaim(new Claim(ClaimTypes.Role, role));
+
+            return claims;
+        }
     }
 }

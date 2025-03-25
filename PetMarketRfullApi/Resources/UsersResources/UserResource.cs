@@ -8,11 +8,13 @@ namespace PetMarketRfullApi.Resources.UsersResources
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string id { get; set; }
         [Required(ErrorMessage = "Name is required.")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address.")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
+        public string[]? Roles { get; set; }
+        public string? Token { get; set; }
 
         //[Required(ErrorMessage = "Password is required.")]
         //[DataType(DataType.Password)]

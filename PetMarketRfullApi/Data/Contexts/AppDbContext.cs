@@ -9,6 +9,10 @@ namespace PetMarketRfullApi.Data.Contexts
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
+            if (Database.GetPendingMigrations().Any())
+            {
+                Database.Migrate();
+            }
         }
 
         public DbSet<Category> Category { get; set; }

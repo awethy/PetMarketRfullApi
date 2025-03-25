@@ -28,6 +28,24 @@ namespace PetMarketRfullApi.Controllers
             return Ok(order);
         }
 
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetOrdersByUserAsync(string userId)
+        {
+            var orders = await _orderService.GetAllAsync();
+            return Ok(orders);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrdersAsync()
+        {
+            var orders = await _orderService.GetAllAsync();
+            if (orders == null)
+            {
+                return NotFound();
+            }
+            return Ok(orders);
+        }
+
         [HttpPost]
         [Authorize(Policy = "CreateOrder")]
         public async Task<ActionResult<OrderResource>> AddOrder(CreateOrderResource createOrder)

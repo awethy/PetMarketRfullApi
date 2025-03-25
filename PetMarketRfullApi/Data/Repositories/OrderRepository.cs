@@ -19,9 +19,12 @@ namespace PetMarketRfullApi.Data.Repositories
             return order;
         }
 
-        public async Task<List<Order>> GetAll()
+        public async Task<List<Order>> GetAllAsync()
         {
-            return await _appDbContext.Orders.ToListAsync();
+            return await _appDbContext.Orders
+                .Include(o => o.Cart)
+                .ThenInclude(c => c.Items)
+                .ToListAsync();
         }
 
         public async Task<Order> GetById(Guid orderId)
@@ -29,7 +32,7 @@ namespace PetMarketRfullApi.Data.Repositories
             return await _appDbContext.Orders.FindAsync(orderId);
         }
 
-        public async Task<List<Order>> GetByUser(string userId)
+        public async Task<List<Order>> GetByUserAsync(string userId)
         {
             return await _appDbContext.Orders.Where(o => o.UserId == userId).ToListAsync();
         }

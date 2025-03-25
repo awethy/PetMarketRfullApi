@@ -30,9 +30,9 @@ namespace PetMarketRfullApi.Tests
             var orderId = Guid.NewGuid();
 
             // Создаем тестовые данные с явно указанными ID
-            var cartItems = new List<CartItemResource>
-            { new CartItemResource { PetId = 1} };
-            var cartResource = new CartResource { Id = cartId, Items = cartItems };
+            //var cartItems = new List<CartItemResource>
+            //{ new CartItemResource { PetId = 1} };
+            var cartResource = new CartResource { Id = cartId, Items = new List<CartItemResource>() };
 
             var createOrderResource = new CreateOrderResource
             {
