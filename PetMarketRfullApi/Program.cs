@@ -25,7 +25,8 @@ builder.Services.AddIdentity<User, UserRole>(options =>
     options.SignIn.RequireConfirmedEmail = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+.AddUserManager<UserManager<User>>()
+.AddUserStore<UserStore<User, UserRole, AppDbContext, string>>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>  
