@@ -8,6 +8,7 @@ using PetMarketRfullApi.Options;
 using PetMarketRfullApi.Resources.AccountResources;
 using PetMarketRfullApi.Resources.UsersResources;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 
@@ -67,17 +68,17 @@ namespace PetMarketRfullApi.Sevices
             throw new Exception();
         }
 
-    public async Task<SignInResult> LoginAsync(LoginUserResource userResource)
+    public async Task<UserResource> LoginAsync(LoginUserResource userResource)
         {
             var user = await _userManager.FindByEmailAsync(userResource.Email);
             if (user == null)
             {
-                return SignInResult.Failed;
+                throw new Exception($"User with {userResource.Email} not found.");
             }
                 
             if (await _userManager.IsLockedOutAsync(user))
             {
-                return SignInResult.LockedOut;
+                throw new Exception($"This account is locked!");
             }
 
             var result = await _signInManager.PasswordSignInAsync(user, userResource.Password, userResource.RememberMe, lockoutOnFailure: false);
@@ -91,9 +92,13 @@ namespace PetMarketRfullApi.Sevices
                     Roles = userRoles.ToArray(),
                     Name = user.UserName
                 };
-                GenerateToken(response);
+                return GenerateToken(response);
             }
-            return result;
+            //else
+            //{
+            //    throw new Exception("Email or password incorrected!");
+            //}
+            throw new AuthenticationException();
         }
 
         public async Task LogoutAsync()
@@ -114,7 +119,7 @@ namespace PetMarketRfullApi.Sevices
                 {ClaimTypes.Name, userRegModel.Name!},
                 {ClaimTypes.NameIdentifier, userRegModel.id!},
                 {JwtRegisteredClaimNames.Aud, "test"},
-                {JwtRegisteredClaimNames.Iss, "test" }
+                {JwtRegisteredClaimNames.Iss, "test"}
             };
             var tokenDescriptor = new SecurityTokenDescriptor
             {

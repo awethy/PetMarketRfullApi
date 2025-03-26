@@ -6,7 +6,7 @@ namespace PetMarketRfullApi.Domain.Services
 {
     public interface IAuthService
     {
-        Task<SignInResult> LoginAsync(LoginUserResource userResource);
+        Task<UserResource> LoginAsync(LoginUserResource userResource);
 
         Task LogoutAsync();
 

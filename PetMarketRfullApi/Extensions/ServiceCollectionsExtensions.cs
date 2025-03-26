@@ -123,7 +123,7 @@ namespace PetMarketRfullApi.Extensions
                 {
                     x.RequireHttpsMetadata = false;
                     x.SaveToken = true;
-                    x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    x.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
                             builder.Configuration["Authentication:TokenPrivateKey"]!)),
@@ -131,11 +131,11 @@ namespace PetMarketRfullApi.Extensions
                         ValidateAudience = false
                     };
                 });
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("admin", policy => policy.RequireRole("admin"));
-                options.AddPolicy("user", policy => policy.RequireRole("user"));
-            });
+            //builder.Services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
+            //    options.AddPolicy("user", policy => policy.RequireRole("user"));
+            //});
             builder.Services.AddTransient<IAuthService, AuthService>();
 
             return builder;

@@ -23,6 +23,7 @@ builder.Services.AddAutoMapper(typeof(ModelToResourceProfile));
 builder.Services.AddIdentity<User, UserRole>(options =>
 {
     options.SignIn.RequireConfirmedEmail = false;
+    options.Password.RequireNonAlphanumeric = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddUserManager<UserManager<User>>()
