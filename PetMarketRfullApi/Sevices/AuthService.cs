@@ -23,7 +23,10 @@ namespace PetMarketRfullApi.Sevices
 
         private readonly AuthOptions _authOptions;
 
-        public AuthService(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IOptions<AuthOptions> authOptions)
+        public AuthService(IMapper mapper,
+                           UserManager<User> userManager,
+                           SignInManager<User> signInManager,
+                           IOptions<AuthOptions> authOptions)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -43,11 +46,8 @@ namespace PetMarketRfullApi.Sevices
                 var createdUser = await _userManager.CreateAsync(userEn, createUserResource.Password);
                 if (createdUser.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(createUserResource.Email);
-                    if (user == null) 
-                    {
-                        throw new Exception($"User with email {createUserResource.Email} not registered"); 
-                    }
+                    var user = await _userManager.FindByEmailAsync(createUserResource.Email) 
+                    ?? throw new Exception($"User with email {createUserResource.Email} not registered");
 
                     var result = await _userManager.AddToRoleAsync(userEn, "user");
                     if (result.Succeeded)
@@ -70,12 +70,9 @@ namespace PetMarketRfullApi.Sevices
 
     public async Task<UserResource> LoginAsync(LoginUserResource userResource)
         {
-            var user = await _userManager.FindByEmailAsync(userResource.Email);
-            if (user == null)
-            {
-                throw new Exception($"User with {userResource.Email} not found.");
-            }
-                
+            var user = await _userManager.FindByEmailAsync(userResource.Email) 
+                ?? throw new Exception($"User with {userResource.Email} not found.");
+
             if (await _userManager.IsLockedOutAsync(user))
             {
                 throw new Exception($"This account is locked!");

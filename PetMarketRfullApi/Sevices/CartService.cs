@@ -3,7 +3,6 @@ using PetMarketRfullApi.Domain.Models.OrderModels;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
 using PetMarketRfullApi.Resources.CartsResources;
-using System.Net.Http.Headers;
 
 namespace PetMarketRfullApi.Sevices
 {

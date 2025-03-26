@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Domain.Services;
 using PetMarketRfullApi.Resources.AccountResources;
 using PetMarketRfullApi.Resources.UsersResources;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace PetMarketRfullApi.Sevices
 {
@@ -54,7 +52,8 @@ namespace PetMarketRfullApi.Sevices
         public async Task<IEnumerable<UserResource>> GetAllUsersAsync()
         {
                 var users = await _unitOfWork.Users.GetAllUsersAsync();
-                return _mapper.Map<IEnumerable<UserResource>>(users);
+               return _mapper.Map<IEnumerable<UserResource>>(users);
+
         }
 
         public async Task<UserResource> GetUserByIdAsync(string id)
