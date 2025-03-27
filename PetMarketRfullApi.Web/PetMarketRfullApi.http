@@ -1,6 +1,0 @@
-@PetMarketRfullApi_HostAddress = http://localhost:5216
-
-GET {{PetMarketRfullApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
