@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using PetMarketRfullApi.Web.Extensions;
 using PetMarketRfullApi.Application.Mapping;
 using PetMarketRfullApi.Infrastructure.Data.Contexts;
+using PetMarketRfullApi.Application.Abstractions;
+using PetMarketRfullApi.Domain.Options;
+using RabbitMQ.Client;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +32,22 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 
 builder
-    .AddOptions()
     .AddBearerAuthentication()
+    .AddOptions()
     .AddSwagger()
     .AppData()
+    .AddRedis()
+    .AddApplicationServices()
     .AddAuthorization()
-    .AddApplicationServices();
+    .AddBackgroundService();
+
+// Временная проверка конфигурации
+var rabbitConfig = builder.Configuration.GetSection("RabbitMQ").Get<RabbitMqOptions>();
+Console.WriteLine($"RabbitMQ Config: {JsonSerializer.Serialize(rabbitConfig)}");
+
+// Проверка регистрации сервисов
+Console.WriteLine($"IConnection registered: {builder.Services.Any(x => x.ServiceType == typeof(IConnection))}");
+Console.WriteLine($"IRabbitMqChannelFactory registered: {builder.Services.Any(x => x.ServiceType == typeof(IRabbitMqChannelFactory))}");
 
 var app = builder.Build();
 

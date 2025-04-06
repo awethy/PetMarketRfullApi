@@ -1,13 +1,13 @@
-﻿namespace PetMarketRfullApi.Application.Resources.CartsResources
+﻿using PetMarketRfullApi.Domain.Models;
+
+namespace PetMarketRfullApi.Application.Resources.CartsResources
 {
     public class CartItemResource
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string Name { get; set; }
         public int Quantity { get; set; }
-        public decimal Price { get; set; }
-        //public int ProductId { get; set; }
-        //public int PetId {  get; set; } 
-        //public Guid CartId { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal SubTotal => Quantity * UnitPrice;
     }
 }

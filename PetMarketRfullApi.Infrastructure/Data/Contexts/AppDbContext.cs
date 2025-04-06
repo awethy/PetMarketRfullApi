@@ -2,6 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Models.OrderModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PetMarketRfullApi.Infrastructure.Data.Contexts
 {
@@ -25,6 +30,15 @@ namespace PetMarketRfullApi.Infrastructure.Data.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CartItem>(b =>
+            {
+                b.HasKey(k => new { k.CartId, k.ItemId });
+                b.HasOne(p => p.Pet);
+                b.HasOne(p => p.Cart)
+                    .WithMany(m => m.Items)
+                    .HasForeignKey(k => k.CartId);
+            });
+
             // Настройка отношений и category
             modelBuilder.Entity<Pet>()
                 .HasOne(p => p.Category)

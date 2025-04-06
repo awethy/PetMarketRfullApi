@@ -16,23 +16,35 @@ namespace PetMarketRfullApi.Application.Sevices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<CartResource> CreateCartAsync(CartResource cartResource)
+        public async Task<CartResource> CreateCartAsync(CartRequest cartRequest)
         {
-            var cart = _mapper.Map<Cart>(cartResource);
-            // Создание корзины и сохранение в базу данных
-            var cartSaveResult = await _unitOfWork.Carts.CreateCartAsync(cart);
+            var cart = new Cart();
 
-            // Маппинг CartItemResource в CartItem и установка CartId в контекст маппинга
-            var cartItems = _mapper.Map<List<CartItem>>(cartResource.Items, opts =>
+            if (cartRequest.Items.Any())
             {
-                opts.Items["CartId"] = cartSaveResult.Id;
-            });
+                cart.Items = _mapper.Map<List<CartItem>>(cartRequest.Items).ToList();
+            }
 
-            // Добавление элементов корзины в базу данных
-            await _unitOfWork.CartItems.AddRangeItemsAsync(cartItems);
+            _unitOfWork.Carts.CreateCartAsync(cart);
+            return await EnrichCart(cart);
+        }
 
-            await _unitOfWork.SaveChangesAsync();
-            
+        public async Task<CartResource> FindByIdAsync(Guid id)
+        {
+            var cart = await _unitOfWork.Carts.GetCartByIdAsync(id);
+            return await EnrichCart(cart);
+        }
+
+        public async Task<CartResource> EnrichCart(Cart cart)
+        {
+            if (cart == null) return null;
+
+            foreach (var item in cart.Items)
+            {
+                var gotItem = await _unitOfWork.Pets.GetPetByIdAsync(item.ItemId);
+                item.UnitPrice = gotItem.Price;
+                item.Name = gotItem.Name;
+            }
             return _mapper.Map<CartResource>(cart);
         }
     }

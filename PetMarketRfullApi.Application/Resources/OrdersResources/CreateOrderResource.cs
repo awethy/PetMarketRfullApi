@@ -7,8 +7,7 @@ namespace PetMarketRfullApi.Application.Resources.OrdersResources
         public DateTime? OrderDate { get; set; } = DateTime.UtcNow;
         public decimal? TotalPrice { get; set; }
         public string? Status { get; set; }
-        public string? UserId { get; set; }
 
-        public CartResource? Cart { get; set; } = null!; 
+        public CartRequest? Cart { get; set; } = null!; 
     }
 }

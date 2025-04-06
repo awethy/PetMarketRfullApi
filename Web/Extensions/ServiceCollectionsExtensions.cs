@@ -10,6 +10,10 @@ using PetMarketRfullApi.Application.Sevices;
 using Microsoft.OpenApi.Models;
 using PetMarketRfullApi.Infrastructure.Data.Contexts;
 using PetMarketRfullApi.Infrastructure.Data.Repositories;
+using PetMarketRfullApi.Web.BackgroundServices;
+using RabbitMQ.Client;
+using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 
 namespace PetMarketRfullApi.Web.Extensions
@@ -55,7 +59,22 @@ namespace PetMarketRfullApi.Web.Extensions
         public static WebApplicationBuilder AppData(this WebApplicationBuilder builder)
         {
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("MyConString")));
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("PgConString"),
+                    opt => opt.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorCodesToAdd: null
+                    )
+                )
+            );
+            return builder;
+        }
+
+        public static WebApplicationBuilder AddRedis(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer
+                .Connect(ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"))));
 
             return builder;
         }
@@ -106,7 +125,16 @@ namespace PetMarketRfullApi.Web.Extensions
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-            builder.Services.AddScoped<ICartService, CartService>(); 
+            builder.Services.AddScoped<ICartService, CartService>();
+
+            builder.Services.AddSingleton<IRabbitMqChannelFactory, RabbitMqChannelFactory>();
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder AddBackgroundService( this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHostedService<CreateOrderConsumer>();
 
             return builder;
         }
@@ -131,11 +159,6 @@ namespace PetMarketRfullApi.Web.Extensions
                         ValidateAudience = false
                     };
                 });
-            //builder.Services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
-            //    options.AddPolicy("user", policy => policy.RequireRole("user"));
-            //});
             builder.Services.AddTransient<IAuthService, AuthService>();
 
             return builder;
@@ -144,6 +167,31 @@ namespace PetMarketRfullApi.Web.Extensions
         public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
         {
             builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Authentication"));
+            builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMQ"));
+
+            builder.Services.AddSingleton<IConnection>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
+                var factory = new ConnectionFactory
+                {
+                    HostName = options.HostName,
+                    Port = options.Port,
+                    UserName = options.UserName,
+                    Password = options.Password,
+                    VirtualHost = options.VirtualHost
+                };
+                try
+                {
+                    var connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                    Console.WriteLine("✅ RabbitMQ connection established");
+                    return connection;
+                }
+                catch (Exception ex) 
+                {
+                    Console.WriteLine($"❌ Failed to create RabbitMQ connection: {ex.Message}");
+                    throw;
+                }
+            });
 
             return builder;
         }

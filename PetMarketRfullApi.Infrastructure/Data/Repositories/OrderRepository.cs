@@ -23,7 +23,7 @@ namespace PetMarketRfullApi.Infrastructure.Data.Repositories
         {
             return await _appDbContext.Orders
                 .Include(o => o.Cart)
-                .ThenInclude(c => c.Items)
+                    .ThenInclude(c => c.Items)
                 .ToListAsync();
         }
 

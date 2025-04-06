@@ -11,6 +11,7 @@ using AutoMapper;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace PetMarketRfullApi.Application.Sevices
 {
@@ -22,6 +23,7 @@ namespace PetMarketRfullApi.Application.Sevices
         private readonly SignInManager<User> _signInManager;
 
         private readonly AuthOptions _authOptions;
+        
 
         public AuthService(IMapper mapper,
                            UserManager<User> userManager,
