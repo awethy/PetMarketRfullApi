@@ -3,6 +3,7 @@ using PetMarketRfullApi.Domain.Models.OrderModels;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Application.Resources.CartsResources;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace PetMarketRfullApi.Application.Sevices
 {
@@ -42,8 +43,15 @@ namespace PetMarketRfullApi.Application.Sevices
             foreach (var item in cart.Items)
             {
                 var gotItem = await _unitOfWork.Pets.GetPetByIdAsync(item.ItemId);
-                item.UnitPrice = gotItem.Price;
-                item.Name = gotItem.Name;
+                if (gotItem != null)
+                {
+                    item.UnitPrice = gotItem.Price;
+                    item.Name = gotItem.Name;
+                }
+                else
+                {
+                    throw new Exception($"item with id = {item.ItemId} not found");
+                }
             }
             return _mapper.Map<CartResource>(cart);
         }

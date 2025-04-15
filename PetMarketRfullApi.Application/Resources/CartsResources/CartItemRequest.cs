@@ -10,7 +10,7 @@ namespace PetMarketRfullApi.Application.Resources.CartsResources
     public class CartItemRequest
     {
         [Required]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         [Required]
         public int Quantity { get; set; }
     }
