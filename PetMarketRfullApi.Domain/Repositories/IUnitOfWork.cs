@@ -8,6 +8,7 @@
         IOrderRepository Orders { get; }
         ICartRepository Carts { get; }
         ICartItemRepository CartItems { get; }
+        IRedisCartRepository RedisCarts { get; }
 
         Task<int> SaveChangesAsync();
     }

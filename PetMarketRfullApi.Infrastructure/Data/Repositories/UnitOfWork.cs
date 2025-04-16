@@ -1,5 +1,6 @@
 ﻿using PetMarketRfullApi.Infrastructure.Data.Contexts;
 using PetMarketRfullApi.Domain.Repositories;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace PetMarketRfullApi.Infrastructure.Data.Repositories
 {
@@ -21,6 +22,7 @@ namespace PetMarketRfullApi.Infrastructure.Data.Repositories
         public IOrderRepository Orders { get; }
         public ICartRepository Carts { get; }
         public ICartItemRepository CartItems { get; }
+        public IRedisCartRepository RedisCarts { get; }
 
         public async Task<int> SaveChangesAsync()
         {
