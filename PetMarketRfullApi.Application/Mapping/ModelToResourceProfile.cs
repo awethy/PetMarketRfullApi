@@ -48,6 +48,8 @@ namespace PetMarketRfullApi.Application.Mapping
 
             CreateMap<CartItemRequest, CartItem>().ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.Id));
             CreateMap<CartItem, CartItemResource>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ItemId));
+
+            CreateMap<Cart, CartRequest>();
         }
     }
 }

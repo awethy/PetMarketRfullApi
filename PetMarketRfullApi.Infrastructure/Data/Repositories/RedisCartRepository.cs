@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using PetMarketRfullApi.Domain.Models.OrderModels;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Infrastructure.Data.Contexts;
@@ -20,16 +21,10 @@ namespace PetMarketRfullApi.Infrastructure.Data.Repositories
             _database = redis.GetDatabase();
         }
 
-        public async Task CreateOrUpdateAsync(Cart cart)
+        public async Task SaveCartAsync(Guid id, IEnumerable<HashEntry> entries)
         {
-            var cartKey = GetCartKey(cart.Id);
-
-            //Преобразует каждый товар в корзине в структуру HashEntry (пару "поле-значение" для Redis)
-            var entries = cart.Items
-                .Select(i => new HashEntry(i.ItemId.ToString(), i.Quantity.ToString()))
-                .ToArray();
-
-            await _database.HashSetAsync(cartKey, entries);
+            var cartKey = GetCartKey(id);
+            await _database.HashSetAsync(cartKey, entries.ToArray());
             await _database.KeyExpireAsync(cartKey, TimeSpan.FromMinutes(30));
         }
 

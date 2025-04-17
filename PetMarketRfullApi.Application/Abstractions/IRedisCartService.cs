@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PetMarketRfullApi.Application.Resources.CartsResources;
+﻿using PetMarketRfullApi.Application.Resources.CartsResources;
 
 namespace PetMarketRfullApi.Application.Abstractions
 {
@@ -13,6 +8,6 @@ namespace PetMarketRfullApi.Application.Abstractions
         Task<CartResource> CreateCartAsync(CartRequest request);
         Task<CartResource> UpdateCartAsync(Guid id, CartRequest request);
         Task DeleteCartAsync(Guid id);
-        Task ValidateCartItems(IEnumerable<CartItemRequest> items);
+        Task<bool> ExistsCartAsync(Guid id);
     }
 }
