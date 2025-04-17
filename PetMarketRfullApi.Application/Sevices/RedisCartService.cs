@@ -18,6 +18,7 @@ namespace PetMarketRfullApi.Application.Sevices
             _petService = petService;
             _mapper = mapper;
         }
+
 // TODO: Сделать сервисные CRUD'ы Create, Update, Delete, Exists с проверками данных 
         public async Task<CartResource> CreateCartAsync(CartRequest request)
         {
@@ -30,7 +31,20 @@ namespace PetMarketRfullApi.Application.Sevices
             await _unitOfWork.RedisCarts.SaveCartAsync(id, entries);
 
             // Обогащаем данные о товарах
-            var items = await MapReqItemToItemResource(request.Items);
+            var items = await MapReqItemToItemResourceAsync(request.Items);
+
+            return new CartResource { Id = id, Items = items };
+        }
+
+        public async Task<CartResource> UpdateCartAsync(Guid id, CartRequest request)
+        {
+            ValidateCart(request);
+
+            var entries = ConvertToHashEntries(request.Items);
+
+            await _unitOfWork.RedisCarts.SaveCartAsync(id, entries);
+
+            var items = await MapReqItemToItemResourceAsync(request.Items);
 
             return new CartResource { Id = id, Items = items };
         }
@@ -49,20 +63,16 @@ namespace PetMarketRfullApi.Application.Sevices
             ValidateCart(request);
 
             // Обогащаем данные о товарах
-            var items = await MapReqItemToItemResource(request.Items);
+            var items = await MapReqItemToItemResourceAsync(request.Items);
 
             return new CartResource { Id = id, Items = items };
-        }
-
-        public Task<CartResource> UpdateCartAsync(Guid id, CartRequest request)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<bool> ExistsCartAsync(Guid id)
         {
             throw new NotImplementedException();
         }
+
 
 
         private static void ValidateCart(CartRequest cartRequest)
@@ -72,7 +82,7 @@ namespace PetMarketRfullApi.Application.Sevices
             if (cartRequest.Items == null) throw new ArgumentException("Cart items collection cannot be null", nameof(cartRequest.Items));
         }
 
-        private async Task<List<CartItemResource>> MapReqItemToItemResource(IEnumerable<CartItemRequest> reqItems)
+        private async Task<List<CartItemResource>> MapReqItemToItemResourceAsync(IEnumerable<CartItemRequest> reqItems)
         {
             var items = new List<CartItemResource>();
             foreach (var item in reqItems)
