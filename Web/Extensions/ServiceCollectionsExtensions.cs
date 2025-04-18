@@ -126,6 +126,12 @@ namespace PetMarketRfullApi.Web.Extensions
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+            builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
+            builder.Services.AddScoped<IRedisCartRepository, RedisCartRepository>();
+            builder.Services.AddScoped<IRedisCartService, RedisCartService>();
 
             builder.Services.AddSingleton<IRabbitMqChannelFactory, RabbitMqChannelFactory>();
 

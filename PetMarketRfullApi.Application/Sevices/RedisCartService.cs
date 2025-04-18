@@ -19,7 +19,6 @@ namespace PetMarketRfullApi.Application.Sevices
             _mapper = mapper;
         }
 
-// TODO: Сделать сервисные CRUD'ы Create, Update, Delete, Exists с проверками данных 
         public async Task<CartResource> CreateCartAsync(CartRequest request)
         {
             ValidateCart(request);
@@ -49,9 +48,12 @@ namespace PetMarketRfullApi.Application.Sevices
             return new CartResource { Id = id, Items = items };
         }
 
-        public Task DeleteCartAsync(Guid id)
+        public async Task DeleteCartAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var cart = await _unitOfWork.RedisCarts.GetAsync(id);
+            if (cart == null) throw new ArgumentNullException(nameof(cart));
+
+            await _unitOfWork.RedisCarts.DeleteAsync(id);
         }
 
         public async Task<CartResource> GetCartById(Guid id)
@@ -68,13 +70,17 @@ namespace PetMarketRfullApi.Application.Sevices
             return new CartResource { Id = id, Items = items };
         }
 
-        public Task<bool> ExistsCartAsync(Guid id)
+        //Проверка на наличие cart
+        public async Task<bool> ExistsCartAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var cart = await _unitOfWork.RedisCarts.GetAsync(id);
+            if (cart == null) return false;
+            return true;
         }
 
 
 
+        //Проверка корзины на ниличие и на наличие позиций корзины
         private static void ValidateCart(CartRequest cartRequest)
         {
             if (cartRequest == null) throw new ArgumentNullException(nameof(cartRequest));
@@ -82,6 +88,7 @@ namespace PetMarketRfullApi.Application.Sevices
             if (cartRequest.Items == null) throw new ArgumentException("Cart items collection cannot be null", nameof(cartRequest.Items));
         }
 
+        //Маппер List<CartItemRequest> to List<CartItemResource>
         private async Task<List<CartItemResource>> MapReqItemToItemResourceAsync(IEnumerable<CartItemRequest> reqItems)
         {
             var items = new List<CartItemResource>();
@@ -101,6 +108,7 @@ namespace PetMarketRfullApi.Application.Sevices
             return items;
         }
 
+        //Конвертация list<CartItemRequest> в hash для сохранении в redis бд
         private static IEnumerable<HashEntry> ConvertToHashEntries(IEnumerable<CartItemRequest> items)
         {
             return items?
