@@ -23,6 +23,40 @@ namespace PetMarketRfullApi.Web.Controllers
             return cart != null ? Ok(cart) : NotFound();
         }
 
-        // TODO: Добавить CRUD'ы - Create, Update, Delete, Exists
+        [HttpPost("Redis-create")]
+        public async Task<ActionResult<CartResource>> RedisCreateCart(CartRequest request)
+        {
+            var cart = await _cartService.CreateCartAsync(request);
+            return cart == null ? NotFound() : Ok(cart);
+        }
+
+        [HttpPost("Redis-update{id}")]
+        public async Task<ActionResult<CartResource>> RedisUpdateCart(Guid id, CartRequest request)
+        {
+            var cart = await _cartService.UpdateCartAsync(id, request);
+            return cart == null ? NotFound() : Ok(cart);
+        }
+
+        [HttpDelete("Redis-delete{id}")]
+        public async Task<IActionResult> RedisDeleteCart(Guid id)
+        {
+            try
+            {
+                await _cartService.DeleteCartAsync(id);
+                return Ok();
+            }
+            catch (Exception ex) { return NotFound(ex.Message); }
+        }
+
+        [HttpGet("Redis-exists{id}")]
+        public async Task<IActionResult> ExistsCart(Guid id)
+        {
+            var haveCart = await _cartService.ExistsCartAsync(id);
+            if (haveCart == false)
+            {
+                return NotFound($"Cart с id-{id} не найден");
+            }
+            return Ok($"Cart с id-{id} есть в кэше Redis");
+        }
     }
 }
