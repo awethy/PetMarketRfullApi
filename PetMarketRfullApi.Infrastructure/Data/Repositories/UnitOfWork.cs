@@ -1,13 +1,20 @@
 ﻿using PetMarketRfullApi.Infrastructure.Data.Contexts;
 using PetMarketRfullApi.Domain.Repositories;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using RabbitMQ.Client;
+using StackExchange.Redis;
 
 namespace PetMarketRfullApi.Infrastructure.Data.Repositories
 {
     public class UnitOfWork : BaseRepositories, IUnitOfWork
     {
-        public UnitOfWork(AppDbContext appDbContext) : base(appDbContext) 
+        private readonly IConnectionMultiplexer _redis;
+
+        public UnitOfWork(IConnectionMultiplexer redis , AppDbContext appDbContext) : base(appDbContext) 
         {
+            _redis = redis;
+
+            RedisCarts = new RedisCartRepository(_redis, appDbContext);
             Categories = new CategoryRepository(_appDbContext);
             Pets = new PetRepository(_appDbContext);
             Users = new UserRepository(_appDbContext);

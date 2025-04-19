@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Application.Resources.CartsResources;
 using PetMarketRfullApi.Domain.Repositories;
@@ -23,7 +24,14 @@ namespace PetMarketRfullApi.Application.Sevices
         {
             ValidateCart(request);
 
-            var entries = ConvertToHashEntries(request.Items);
+            var entries = new List<HashEntry>();
+            foreach (var item in request.Items)
+            {
+                entries.Add(new HashEntry(
+                        item.Id.ToString(),
+                        item.Quantity.ToString()
+                    ));
+            }
 
             Guid id = Guid.NewGuid();
             
@@ -39,7 +47,14 @@ namespace PetMarketRfullApi.Application.Sevices
         {
             ValidateCart(request);
 
-            var entries = ConvertToHashEntries(request.Items);
+            var entries = new List<HashEntry>();
+            foreach (var item in request.Items)
+            {
+                entries.Add(new HashEntry(
+                        item.Id.ToString(),
+                        item.Quantity.ToString()
+                    ));
+            }
 
             await _unitOfWork.RedisCarts.SaveCartAsync(id, entries);
 
@@ -109,6 +124,7 @@ namespace PetMarketRfullApi.Application.Sevices
         }
 
         //Конвертация list<CartItemRequest> в hash для сохранении в redis бд
+        // НЕ работает
         private static IEnumerable<HashEntry> ConvertToHashEntries(IEnumerable<CartItemRequest> items)
         {
             return items?
@@ -119,4 +135,4 @@ namespace PetMarketRfullApi.Application.Sevices
                 )) ?? Enumerable.Empty<HashEntry>();
         }
     }
-}
+}   
