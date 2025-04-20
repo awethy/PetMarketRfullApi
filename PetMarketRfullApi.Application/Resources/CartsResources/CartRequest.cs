@@ -8,6 +8,6 @@ namespace PetMarketRfullApi.Application.Resources.CartsResources
 {
     public class CartRequest
     {
-        public List<CartItemRequest> Items { get; set; } = new List<CartItemRequest>(); 
+        public List<CartItemRequest> Items { get; set; } = new List<CartItemRequest>();
     }
 }

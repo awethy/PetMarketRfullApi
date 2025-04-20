@@ -24,7 +24,10 @@ namespace PetMarketRfullApi.Infrastructure.Data.Repositories
         public async Task SaveCartAsync(Guid id, IEnumerable<HashEntry> entries)
         {
             var cartKey = GetCartKey(id);
-            await _database.HashSetAsync(cartKey, entries.ToArray());
+            foreach (var entry in entries)
+            {
+                await _database.HashSetAsync(cartKey, entry.Name, entry.Value);
+            }
             await _database.KeyExpireAsync(cartKey, TimeSpan.FromMinutes(30));
         }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Application.Resources.CartsResources;
+using PetMarketRfullApi.Domain.Models.OrderModels;
 using PetMarketRfullApi.Domain.Repositories;
 using StackExchange.Redis;
 
@@ -22,30 +23,23 @@ namespace PetMarketRfullApi.Application.Sevices
 
         public async Task<CartResource> CreateCartAsync(CartRequest request)
         {
-            ValidateCart(request);
+            ValidateCart(request, r => r.Items, item => item.Quantity);
 
-            var entries = new List<HashEntry>();
-            foreach (var item in request.Items)
-            {
-                entries.Add(new HashEntry(
-                        item.Id.ToString(),
-                        item.Quantity.ToString()
-                    ));
-            }
+            var entries = ConvertToHashEntries(request.Items);
 
             Guid id = Guid.NewGuid();
             
             await _unitOfWork.RedisCarts.SaveCartAsync(id, entries);
 
             // Обогащаем данные о товарах
-            var items = await MapReqItemToItemResourceAsync(request.Items);
+            var items = await MapItemsToResourcesAsync(request.Items, item => item.Id, item => item.Quantity);
 
             return new CartResource { Id = id, Items = items };
         }
 
         public async Task<CartResource> UpdateCartAsync(Guid id, CartRequest request)
         {
-            ValidateCart(request);
+            ValidateCart(request, r => r.Items, item => item.Quantity);
 
             var entries = new List<HashEntry>();
             foreach (var item in request.Items)
@@ -58,7 +52,7 @@ namespace PetMarketRfullApi.Application.Sevices
 
             await _unitOfWork.RedisCarts.SaveCartAsync(id, entries);
 
-            var items = await MapReqItemToItemResourceAsync(request.Items);
+            var items = await MapItemsToResourcesAsync(request.Items, item => item.Id, item => item.Quantity);
 
             return new CartResource { Id = id, Items = items };
         }
@@ -75,12 +69,9 @@ namespace PetMarketRfullApi.Application.Sevices
         {
             var cart = await _unitOfWork.RedisCarts.GetAsync(id);
 
-            var request = _mapper.Map<CartRequest>(cart);
+            ValidateCart(cart, c => c.Items, item => item.Quantity);
 
-            ValidateCart(request);
-
-            // Обогащаем данные о товарах
-            var items = await MapReqItemToItemResourceAsync(request.Items);
+            var items = await MapItemsToResourcesAsync(cart.Items, item => item.ItemId, item => item.Quantity);
 
             return new CartResource { Id = id, Items = items };
         }
@@ -96,31 +87,49 @@ namespace PetMarketRfullApi.Application.Sevices
 
 
         //Проверка корзины на ниличие и на наличие позиций корзины
-        private static void ValidateCart(CartRequest cartRequest)
+        private static void ValidateCart<TCart, TItem>(TCart cart, 
+            Func<TCart, IEnumerable<TItem>> getItems,
+            Func<TItem, int> getQuantityFunc)
+            where TCart : class
         {
-            if (cartRequest == null) throw new ArgumentNullException(nameof(cartRequest));
+            if (cart == null) throw new ArgumentNullException(nameof(cart));
 
-            if (cartRequest.Items == null) throw new ArgumentException("Cart items collection cannot be null", nameof(cartRequest.Items));
+            var items = getItems(cart);
+            if (items == null) throw new ArgumentException("Cart items collection cannot be null", nameof(items));
+
+            //проверка каждого товара
+            foreach ( var item in items)
+            {
+                var quantity = getQuantityFunc(item);
+                if (quantity == 0 || quantity <= 0)
+                {
+                    throw new Exception($"Invalid quantity ({quantity}) for item ({item}), nameof({items})");
+                }
+            }
         }
 
         //Маппер List<CartItemRequest> to List<CartItemResource>
-        private async Task<List<CartItemResource>> MapReqItemToItemResourceAsync(IEnumerable<CartItemRequest> reqItems)
+        private async Task<List<CartItemResource>> MapItemsToResourcesAsync<T>(
+            IEnumerable<T> items,
+            Func<T, int> getId,
+            Func<T, int> getQuantity) 
         {
-            var items = new List<CartItemResource>();
-            foreach (var item in reqItems)
+            var result = new List<CartItemResource>();
+            foreach (var item in items)
             {
-                var product = await _petService.GetPetByIdAsync(item.Id);
+                var id = getId(item);
+                var product = await _petService.GetPetByIdAsync(id);
                 if (product == null) continue;
 
-                items.Add(new CartItemResource
+                result.Add(new CartItemResource
                 {
-                    Id = item.Id,
+                    Id = id,
                     Name = product.Name,
-                    Quantity = item.Quantity,
+                    Quantity = getQuantity(item),
                     UnitPrice = product.Price
                 });
             }
-            return items;
+            return result;
         }
 
         //Конвертация list<CartItemRequest> в hash для сохранении в redis бд
