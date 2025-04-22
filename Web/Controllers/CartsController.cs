@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Application.Resources.CartsResources;
-using PetMarketRfullApi.Infrastructure.Data.Repositories;
 
 namespace PetMarketRfullApi.Web.Controllers
 {

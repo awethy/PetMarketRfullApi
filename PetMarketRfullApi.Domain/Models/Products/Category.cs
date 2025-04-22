@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PetMarketRfullApi.Domain.Models
+namespace PetMarketRfullApi.Domain.Models.Products
 {
     public class Category
     {
@@ -9,6 +9,6 @@ namespace PetMarketRfullApi.Domain.Models
         public required string Name { get; set; }
         public string Description { get; set; }
         public ICollection<Pet> Pets { get; set; }
-        public ICollection<Product> Products { get; set; }
+        public ICollection<OtherItem> OtherItems { get; set; }
     }
 }

@@ -46,9 +46,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PetMarketRfullApi.Application\PetMarketRfullApi.Application.csproj" />
-    <ProjectReference Include="..\PetMarketRfullApi.Domain\PetMarketRfullApi.Domain.csproj" />
-    <ProjectReference Include="..\PetMarketRfullApi.Infrastructure\PetMarketRfullApi.Infrastructure.csproj" />
+	  <ProjectReference Include="..\PetMarketRfullApi.Domain\PetMarketRfullApi.Domain.csproj" />
+	  <ProjectReference Include="..\PetMarketRfullApi.Application\PetMarketRfullApi.Application.csproj" />
+	  <ProjectReference Include="..\PetMarketRfullApi.Infrastructure\PetMarketRfullApi.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

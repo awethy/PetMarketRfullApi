@@ -58,7 +58,7 @@ namespace PetMarketRfullApi.Infrastructure.Data.Repositories
                 Id = id,
                 Items = entries.Select(e => new CartItem
                 {
-                    ItemId = int.Parse(e.Name),
+                    Id = int.Parse(e.Name),
                     CartId = id,
                     Quantity = int.Parse(e.Value)
                 }).ToList()

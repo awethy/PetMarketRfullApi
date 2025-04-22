@@ -1,4 +1,4 @@
-﻿using PetMarketRfullApi.Domain.Models;
+﻿using PetMarketRfullApi.Domain.Models.Products;
 
 namespace PetMarketRfullApi.Domain.Repositories
 {

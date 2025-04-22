@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
 using PetMarketRfullApi.Application.Abstractions;
 using PetMarketRfullApi.Application.Resources.СategoriesResources;
+using PetMarketRfullApi.Domain.Models.Products;
 
 namespace PetMarketRfullApi.Application.Sevices
 {

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetMarketRfullApi.Infrastructure.Data.Contexts;
@@ -11,9 +12,11 @@ using PetMarketRfullApi.Infrastructure.Data.Contexts;
 namespace PetMarketRfullApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250422184352_productUpdate")]
+    partial class productUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -454,7 +457,7 @@ namespace PetMarketRfullApi.Infrastructure.Migrations
             modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Products.OtherItem", b =>
                 {
                     b.HasOne("PetMarketRfullApi.Domain.Models.Products.Category", "Category")
-                        .WithMany("OtherItems")
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -483,9 +486,9 @@ namespace PetMarketRfullApi.Infrastructure.Migrations
 
             modelBuilder.Entity("PetMarketRfullApi.Domain.Models.Products.Category", b =>
                 {
-                    b.Navigation("OtherItems");
-
                     b.Navigation("Pets");
+
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("PetMarketRfullApi.Domain.Models.User", b =>

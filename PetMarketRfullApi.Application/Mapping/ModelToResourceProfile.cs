@@ -6,6 +6,7 @@ using PetMarketRfullApi.Application.Resources.UsersResources;
 using PetMarketRfullApi.Application.Resources.СategoriesResources;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Models.OrderModels;
+using PetMarketRfullApi.Domain.Models.Products;
 
 namespace PetMarketRfullApi.Application.Mapping
 {
@@ -46,9 +47,9 @@ namespace PetMarketRfullApi.Application.Mapping
 
             CreateMap<Cart, CartResource>();
 
-            CreateMap<CartItemRequest, CartItem>().ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.Id))
+            CreateMap<CartItemRequest, CartItem>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
-            CreateMap<CartItem, CartItemResource>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ItemId))
+            CreateMap<CartItem, CartItemResource>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
 
             CreateMap<Cart, CartRequest>()

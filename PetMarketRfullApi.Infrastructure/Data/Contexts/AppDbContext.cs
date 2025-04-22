@@ -2,11 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Models.OrderModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PetMarketRfullApi.Domain.Models.Products;
 
 namespace PetMarketRfullApi.Infrastructure.Data.Contexts
 {
@@ -25,15 +21,14 @@ namespace PetMarketRfullApi.Infrastructure.Data.Contexts
         public DbSet<Order> Orders { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-        //public DbSet<User> Users { get; set; }
-        public DbSet<Product> Products { get; set; }
+        public DbSet<OtherItem> OtherItem { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CartItem>(b =>
             {
-                b.HasKey(k => new { k.CartId, k.ItemId });
-                b.HasOne(p => p.Pet);
+                b.HasKey(k => new { k.CartId, k.Id });
+                b.HasOne(p => p.Product);
                 b.HasOne(p => p.Cart)
                     .WithMany(m => m.Items)
                     .HasForeignKey(k => k.CartId);
@@ -46,28 +41,29 @@ namespace PetMarketRfullApi.Infrastructure.Data.Contexts
                 .HasForeignKey(p => p.CategoryId);
 
             // Настройка связи между Product и Category
-            modelBuilder.Entity<Product>()
+            modelBuilder.Entity<OtherItem>()
                 .HasOne(p => p.Category)
-                .WithMany(c => c.Products)
+                .WithMany(c => c.OtherItems)
                 .HasForeignKey(p => p.CategoryId);
 
-            // cart & cartitem
-            modelBuilder.Entity<Cart>()
-                .HasMany(c => c.Items)
-                .WithOne(ci => ci.Cart)
-                .HasForeignKey(ci => ci.CartId);
+            //// cart & cartitem
+            //modelBuilder.Entity<Cart>(b =>
+            //{
+            //    b.HasMany(c => c.Items)
+            //        .WithOne(ci => ci.Cart)
+            //        .HasForeignKey(ci => ci.CartId);
+            //});
 
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Cart)
-                .WithOne(c => c.Order)
-                .HasForeignKey<Order>(o => o.CartId);
-
-            // Настройка связи между Order и User
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.User)
-                .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Order>(b =>
+            {
+                b.HasOne(o => o.Cart)
+                    .WithOne(c => c.Order)
+                    .HasForeignKey<Order>(o => o.CartId);
+                b.HasOne(o => o.User)
+                    .WithMany(u => u.Orders)
+                    .HasForeignKey(o => o.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });               
 
             base.OnModelCreating(modelBuilder);
         }

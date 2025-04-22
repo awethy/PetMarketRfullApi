@@ -42,7 +42,7 @@ namespace PetMarketRfullApi.Application.Sevices
 
             foreach (var item in cart.Items)
             {
-                var gotItem = await _unitOfWork.Pets.GetPetByIdAsync(item.ItemId);
+                var gotItem = await _unitOfWork.Pets.GetPetByIdAsync(item.Id);
                 if (gotItem != null)
                 {
                     item.UnitPrice = gotItem.Price;
@@ -50,7 +50,7 @@ namespace PetMarketRfullApi.Application.Sevices
                 }
                 else
                 {
-                    throw new Exception($"item with id = {item.ItemId} not found");
+                    throw new Exception($"item with id = {item.Id} not found");
                 }
             }
             return _mapper.Map<CartResource>(cart);

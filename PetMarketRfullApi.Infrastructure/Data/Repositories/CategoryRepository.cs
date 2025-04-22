@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetMarketRfullApi.Infrastructure.Data.Contexts;
-using PetMarketRfullApi.Domain.Models;
 using PetMarketRfullApi.Domain.Repositories;
+using PetMarketRfullApi.Domain.Models.Products;
 
 namespace PetMarketRfullApi.Infrastructure.Data.Repositories
 {

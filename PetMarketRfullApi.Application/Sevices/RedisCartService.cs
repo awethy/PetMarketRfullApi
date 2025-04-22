@@ -71,7 +71,7 @@ namespace PetMarketRfullApi.Application.Sevices
 
             ValidateCart(cart, c => c.Items, item => item.Quantity);
 
-            var items = await MapItemsToResourcesAsync(cart.Items, item => item.ItemId, item => item.Quantity);
+            var items = await MapItemsToResourcesAsync(cart.Items, item => item.Id, item => item.Quantity);
 
             return new CartResource { Id = id, Items = items };
         }
