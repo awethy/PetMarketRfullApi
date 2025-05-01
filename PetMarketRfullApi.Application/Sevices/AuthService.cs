@@ -121,6 +121,7 @@ namespace PetMarketRfullApi.Application.Sevices
                 {JwtRegisteredClaimNames.Aud, "test"},
                 {JwtRegisteredClaimNames.Iss, "test"}
             };
+            //Описание токена
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = GenerateClaims(userRegModel),
