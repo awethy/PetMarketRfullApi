@@ -115,6 +115,7 @@ namespace PetMarketRfullApi.Application.Sevices
 
             var claims = new Dictionary<string, Object>
             {
+                {ClaimTypes.Email, userRegModel.Email!},
                 {ClaimTypes.Name, userRegModel.Name!},
                 {ClaimTypes.NameIdentifier, userRegModel.id!},
                 {JwtRegisteredClaimNames.Aud, "test"},
@@ -139,7 +140,8 @@ namespace PetMarketRfullApi.Application.Sevices
         private static ClaimsIdentity GenerateClaims(UserResource userRegModel)
         {
             var claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim(ClaimTypes.Name, userRegModel.Email!));
+            claims.AddClaim(new Claim(ClaimTypes.Email, userRegModel.Email!));
+            claims.AddClaim(new Claim(ClaimTypes.Name, userRegModel.Name!));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userRegModel.id!));
             claims.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, "test"));
             claims.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, "test"));
